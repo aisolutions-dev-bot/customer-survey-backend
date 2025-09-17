@@ -19,7 +19,7 @@ import com.example.survey.repository.SurveyResponseRepository;
 
 @RestController
 @RequestMapping("/api/survey")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "${app.cors.allowed-origin}")
 public class SurveyController {
     private static final Logger logger = LoggerFactory.getLogger(SurveyController.class);
     private final SurveyResponseRepository repository;
