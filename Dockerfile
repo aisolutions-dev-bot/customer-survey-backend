@@ -18,6 +18,9 @@ RUN ./gradlew dependencies --no-daemon || true
 # Copy full source
 COPY . .
 
+# Ensure gradlew is executable (AFTER full copy)
+RUN chmod +x gradlew
+
 # Build Spring Boot fat JAR (skip tests to speed up)
 RUN ./gradlew clean bootJar -x test -x check --no-daemon
 
