@@ -18,7 +18,7 @@ import com.example.survey.repository.StaffEvaluationRepository;
 
 @RestController
 @RequestMapping("/api/evaluation")
-@CrossOrigin(origins = "${app.cors.allowed-origin}")
+@CrossOrigin(origins = "https://customer-survey-production.up.railway.app")
 public class EvaluationController {
     
     private final StaffEvaluationRepository repository;
