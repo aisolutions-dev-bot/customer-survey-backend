@@ -18,7 +18,7 @@ import com.example.survey.repository.StaffEvaluationRepository;
 
 @RestController
 @RequestMapping("/api/evaluation")
-@CrossOrigin(origins = "http://localhost:4200")  // Removed trailing slash
+@CrossOrigin(origins = "*")  // Removed trailing slash
 public class EvaluationController {
     
     private final StaffEvaluationRepository repository;
