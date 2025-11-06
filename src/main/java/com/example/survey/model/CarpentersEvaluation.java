@@ -17,6 +17,7 @@ public class CarpentersEvaluation {
     private String staffId;
     private String projectId;
     private String roleType; // "drafter", "engineer", etc.
+    private String departmentId;
     private String evaluatorId; // Unique identifier for each evaluation
     private String evaluatorName;
     private String carpenterLevel;
@@ -51,6 +52,9 @@ public class CarpentersEvaluation {
     
     public String getRoleType() { return roleType; }
     public void setRoleType(String roleType) { this.roleType = roleType; }
+
+    public String getDepartmentId() { return departmentId; }
+    public void setDepartmentId(String departmentId) { this.departmentId = departmentId; }
     
     public String getEvaluatorId() { return evaluatorId; }
     public void setEvaluatorId(String evaluatorId) { this.evaluatorId = evaluatorId; }
@@ -103,7 +107,7 @@ public class CarpentersEvaluation {
     @PrePersist
     protected void onCreate() {
         submittedAt = LocalDateTime.now();
-        calculateWeightedScore("");
+        //calculateWeightedScore("");
     }
     
     private void calculateWeightedScore(String carpenterLevel) {
