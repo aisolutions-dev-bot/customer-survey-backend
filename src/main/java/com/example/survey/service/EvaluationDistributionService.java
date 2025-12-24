@@ -1,38 +1,54 @@
 package com.example.survey.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.survey.dto.EvaluationDistributionFullDTO;
 import com.example.survey.model.EvaluationDistribution;
 import com.example.survey.repository.EvaluationDistributionRepository;
 
 @Service
 public class EvaluationDistributionService {
-    
-    @Autowired
-    private EvaluationDistributionRepository evaluationDistributionRepository;
 
-    /**
-     * Get evaluation distribution by uniqId from m17EvaluationDistributionMgmt table
-     */
-    public EvaluationDistribution getByUniqId(Integer uniqId) {
-        return evaluationDistributionRepository.findById(uniqId).orElse(null);
+  @Autowired
+  private EvaluationDistributionRepository evaluationDistributionRepository;
+
+  /**
+   * Get evaluation distribution by uniqId from m17EvaluationDistributionMgmt
+   * table
+   */
+  public EvaluationDistribution getByUniqId(Integer uniqId) {
+    return evaluationDistributionRepository.findById(uniqId).orElse(null);
+  }
+
+  /**
+   * Get pending evaluation distribution by groupId from
+   * m17EvaluationDistributionMgmt
+   * table
+   */
+  public List<EvaluationDistributionFullDTO> getPendingByUniqId(Integer groupId) {
+
+    return evaluationDistributionRepository.findPendingByGroupId(groupId);
+  }
+
+  /**
+   * Update the status of an evaluation distribution
+   * 
+   * @param uniqId The unique ID of the evaluation distribution
+   * @param status The new status value (e.g., "SUBMITTED", "PENDING",
+   *               "COMPLETED")
+   * @return The updated EvaluationDistribution or null if not found
+   */
+  public EvaluationDistribution updateStatus(Integer uniqId, String status) {
+    EvaluationDistribution distribution = evaluationDistributionRepository.findById(uniqId).orElse(null);
+
+    if (distribution != null) {
+      distribution.setStatus(status);
+      return evaluationDistributionRepository.save(distribution);
     }
-    
-    /**
-     * Update the status of an evaluation distribution
-     * @param uniqId The unique ID of the evaluation distribution
-     * @param status The new status value (e.g., "SUBMITTED", "PENDING", "COMPLETED")
-     * @return The updated EvaluationDistribution or null if not found
-     */
-    public EvaluationDistribution updateStatus(Integer uniqId, String status) {
-        EvaluationDistribution distribution = evaluationDistributionRepository.findById(uniqId).orElse(null);
-        
-        if (distribution != null) {
-            distribution.setStatus(status);
-            return evaluationDistributionRepository.save(distribution);
-        }
-        
-        return null;
-    }    
+
+    return null;
+  }
 }
