@@ -24,6 +24,7 @@ public class CarpentersEvaluation {
   private String evaluatorId; // Unique identifier for each evaluation
   private String evaluatorName;
   private String carpenterLevel;
+  private String formType;
   private String remarks;
 
   // Questions with weighted scores
