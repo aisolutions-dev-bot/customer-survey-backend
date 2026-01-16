@@ -1,5 +1,7 @@
 package com.example.survey.model;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -59,5 +61,9 @@ public class EvaluationDistribution {
   @Column(name = "GroupId")
   @JsonProperty("groupId")
   private Integer groupId; // Values: 'PENDING', 'SUBMITTED', 'COMPLETED', etc.
+
+  @Column(name = "SubmitDate")
+  @JsonProperty("submitDate")
+  private LocalDateTime submitDate;
 
 }
