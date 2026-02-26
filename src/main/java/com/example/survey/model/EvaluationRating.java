@@ -8,13 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 @Entity
 @Table(name = "m17EvaluationRatings")
-@Data
-@NoArgsConstructor
+
 public class EvaluationRating {
   
   @Id
@@ -32,7 +30,7 @@ public class EvaluationRating {
   private String evaluateeId;
 
   @Column(name = "FormType", length = 50)
-  private String formType;
+  private String formType; // CARPENTER, BS-PROJECT, BS-TENDER, DRAFTER, etc.
 
   @Column(name = "SkillSet", length = 50)
   private String skillSet;
@@ -82,6 +80,10 @@ public class EvaluationRating {
   @Column(name = "q11")
   private Integer q11;
 
+  // Constructors
+  public EvaluationRating() {
+  }
+
   @PrePersist
   protected void onCreate() {
     if (submittedAt == null) {
@@ -90,27 +92,136 @@ public class EvaluationRating {
   }
 
   /**
-   * Calculate weighted score based on the number of questions and their weights
-   * For standard form (7 questions):
-   * Q1: 15%, Q2: 35%, Q3: 10%, Q4: 10%, Q5: 10%, Q6: 10%, Q7: 10%
+   * Calculate weighted score based on formType
+   * Each form type has different number of questions and different weights
    */
   public void calculateWeightedScore() {
+    if (formType == null || formType.trim().isEmpty()) {
+        formType = "CARPENTER"; // Default fallback
+      return;
+    }
+
     weightedScore = 0.0;
-    
-    // Standard form calculation (7 questions)
-    if (q1 != null) weightedScore += (q1 * 3.0);  // 15% weight (3 points per rating)
-    if (q2 != null) weightedScore += (q2 * 7.0);  // 35% weight (7 points per rating)
-    if (q3 != null) weightedScore += (q3 * 2.0);  // 10% weight (2 points per rating)
-    if (q4 != null) weightedScore += (q4 * 2.0);  // 10% weight (2 points per rating)
-    if (q5 != null) weightedScore += (q5 * 2.0);  // 10% weight (2 points per rating)
-    if (q6 != null) weightedScore += (q6 * 2.0);  // 10% weight (2 points per rating)
-    if (q7 != null) weightedScore += (q7 * 2.0);  // 10% weight (2 points per rating)
-    
-    // Total max score: 100 (when all questions are rated 5)
-    // Formula: (3*5 + 7*5 + 2*5 + 2*5 + 2*5 + 2*5 + 2*5) = 15 + 35 + 10 + 10 + 10 + 10 + 10 = 100    
+    switch (formType.toUpperCase()) {
+      case "CARPENTER":
+        calculateCarpenterScore();
+        break;
+      case "BS-PROJECT":
+        calculateBsProjectScore();
+        break;
+      case "BS-TENDER":
+        calculateBsTenderScore();
+        break;
+      case "DRAFTER":
+        calculateDrafterScore();
+        break;
+      case "OPERATION":
+        calculateOperationScore();
+        break;
+      default:
+        // For unknown form types, use a generic calculation
+        calculateGenericScore();
+        break;
+    } 
   }
 
-    // Getters and Setters
+  /**
+   * CARPENTER scoring (7 questions)
+   * Q1=15%, Q2=35%, Q3=10%, Q4=20%, Q5=10%, Q6=10%, Q7=5%
+   * NOTE: IGNORE CAPRENTER category scoring, it is still using the original scoring in "CarpenterEvaluation.java" class
+   */
+  private void calculateCarpenterScore() {
+    double[] weights = {15.0, 35.0, 10.0, 20.0, 10.0, 10.0, 5.0};
+    Integer[] answers = {q1, q2, q3, q4, q5, q6, q7};
+    
+    for (int i = 0; i < answers.length && i < weights.length; i++) {
+      if (answers[i] != null) {
+        // Convert rating (1-5) to percentage of weight
+        weightedScore += (answers[i] / 5.0) * weights[i];
+      }
+    }
+  }
+
+  /**
+   * Business Support- PROJECT scoring (7 questions)
+   * Q1=15%, Q2=35%, Q3=10%, Q4=10%, Q5=10%, Q6=10%, Q7=10%
+   */
+  private void calculateBsProjectScore() {
+    double[] weights = {15.0, 35.0, 10.0, 10.0, 10.0, 10.0, 10.0};
+    Integer[] answers = {q1, q2, q3, q4, q5, q6, q7};
+    
+    for (int i = 0; i < answers.length && i < weights.length; i++) {
+      if (answers[i] != null) {
+        // Convert rating (1-5) to percentage of weight
+        weightedScore += (answers[i] / 5.0) * weights[i];
+      }
+    }
+  }
+
+  /**
+   * Business Support- TENDER scoring (6 questions)
+   * Q1=30%, Q2=30%, Q3=20%, Q4=10%, Q5=10%
+   */
+  private void calculateBsTenderScore() {
+    double[] weights = {30.0, 30.0, 20.0, 10.0, 10.0};
+    Integer[] answers = {q1, q2, q3, q4, q5};
+    
+    for (int i = 0; i < answers.length && i < weights.length; i++) {
+      if (answers[i] != null) {
+        // Convert rating (1-5) to percentage of weight
+        weightedScore += (answers[i] / 5.0) * weights[i];
+      }
+    }
+  }
+
+  /**
+   * DRAFTER scoring (6 questions)
+   * Q1=20%, Q2=30%, Q3=20%, Q4=10%, Q5=10%, Q6=10%
+   */
+  private void calculateDrafterScore() {
+    double[] weights = {20.0, 30.0, 20.0, 10.0, 10.0, 10.0};
+    Integer[] answers = {q1, q2, q3, q4, q5, q6};
+    
+    for (int i = 0; i < answers.length && i < weights.length; i++) {
+      if (answers[i] != null) {
+        // Convert rating (1-5) to percentage of weight
+        weightedScore += (answers[i] / 5.0) * weights[i];
+      }
+    }
+  }
+
+  /**
+   * OPERATION scoring (6 questions)
+   * Q1=30%, Q2=30%, Q3=10%, Q4=10%, Q5=10%, Q6=10%
+   */
+  private void calculateOperationScore() {
+    double[] weights = {30.0, 30.0, 10.0, 10.0, 10.0, 10.0};
+    Integer[] answers = {q1, q2, q3, q4, q5, q6};
+    
+    for (int i = 0; i < answers.length && i < weights.length; i++) {
+      if (answers[i] != null) {
+        // Convert rating (1-5) to percentage of weight
+        weightedScore += (answers[i] / 5.0) * weights[i];
+      }
+    }
+  }
+
+  /**
+   * Generic scoring for unknown form types
+   */
+  private void calculateGenericScore() {
+    double[] weights = {10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0};
+    Integer[] answers = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+    
+    for (int i = 0; i < answers.length && i < weights.length; i++) {
+      if (answers[i] != null) {
+        // Convert rating (1-5) to percentage of weight
+        weightedScore += (answers[i] / 5.0) * weights[i];
+      }
+    }
+  }
+
+  // Getters and Setters
   public Long getUniqId() {
     return uniqId;
   }
