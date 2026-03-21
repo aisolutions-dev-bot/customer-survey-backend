@@ -118,6 +118,15 @@ public class EvaluationRating {
       case "OPERATION":
         calculateOperationScore();
         break;
+      case "CEILING":
+        calculateCeilingScore(this.skillSet);
+        break;
+      case "SPRAYPAINT":
+         calculateSpraypaintScore(this.skillSet);
+        break;
+      case "METAL":
+         calculateMetalScore(this.skillSet);
+        break;
       default:
         // For unknown form types, use a generic calculation
         calculateGenericScore();
@@ -202,6 +211,147 @@ public class EvaluationRating {
       if (answers[i] != null) {
         // Convert rating (1-5) to percentage of weight
         weightedScore += (answers[i] / 5.0) * weights[i];
+      }
+    }
+  }
+ 
+  /**
+   * CEILING scoring (Level1 9 questions, Level2 10 questions, Level3 10 questions)
+   */
+  private void calculateCeilingScore(String skillSet) {
+    weightedScore = 0.0;
+    if (skillSet != null) {
+      this.skillSet = skillSet;
+      switch (skillSet) {
+        case "level1" : 
+          double[] weights1 = {10.0, 10.0, 15.0, 15.0, 5.0, 5.0, 15.0, 5.0, 10.0};
+          Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9};
+      
+          for (int i = 0; i < answers1.length && i < weights1.length; i++) {
+            if (answers1[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers1[i] / 5.0) * weights1[i];
+            }
+          }
+          break;
+        case "level2" :
+           double[] weights2 = {10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 5.0, 10.0, 10.0, 15.0};
+          Integer[] answers2 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+      
+          for (int i = 0; i < answers2.length && i < weights2.length; i++) {
+            if (answers2[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers2[i] / 5.0) * weights2[i];
+            }
+          }
+          break;
+        case "level3" :
+           double[] weights3 = {10.0, 5.0, 10.0, 5.0, 5.0, 20.0, 5.0, 10.0, 15.0, 15.0};
+          Integer[] answers3 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+      
+          for (int i = 0; i < answers3.length && i < weights3.length; i++) {
+            if (answers3[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers3[i] / 5.0) * weights3[i];
+            }
+          }
+        default : {
+          // No additional calculation for undefined levels
+        }
+      }
+    }
+  }
+
+  /**
+   * SPRAYPAINT scoring (Level1 11 questions, Level2 11 questions, Level3 11 questions)
+   */
+  private void calculateSpraypaintScore(String skillSet) {
+    weightedScore = 0.0;
+    if (skillSet != null) {
+      this.skillSet = skillSet;
+      switch (skillSet) {
+        case "level1" : 
+          double[] weights1 = {10.0, 5.0, 5.0, 10.0, 10.0, 10.0, 5.0, 5.0, 15.0, 5.0, 10.0};
+          Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11};
+      
+          for (int i = 0; i < answers1.length && i < weights1.length; i++) {
+            if (answers1[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers1[i] / 5.0) * weights1[i];
+            }
+          }
+          break;
+        case "level2" :
+           double[] weights2 = {10.0, 10.0, 5.0, 5.0, 10.0, 10.0, 10.0, 5.0, 10.0, 10.0, 15.0};
+          Integer[] answers2 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11};
+      
+          for (int i = 0; i < answers2.length && i < weights2.length; i++) {
+            if (answers2[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers2[i] / 5.0) * weights2[i];
+            }
+          }
+          break;
+        case "level3" :
+           double[] weights3 = {5.0, 10.0, 5.0, 5.0, 5.0, 5.0, 20.0, 5.0, 10.0, 15.0, 15.0};
+          Integer[] answers3 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11};
+      
+          for (int i = 0; i < answers3.length && i < weights3.length; i++) {
+            if (answers3[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers3[i] / 5.0) * weights3[i];
+            }
+          }
+        default : {
+          // No additional calculation for undefined levels
+        }
+      }
+    }
+  }
+
+  /**
+   * METAL scoring (Level1 9 questions, Level2 10 questions, Level3 10 questions)
+   */
+  private void calculateMetalScore(String skillSet) {
+    weightedScore = 0.0;
+    if (skillSet != null) {
+      this.skillSet = skillSet;
+      switch (skillSet) {
+        case "level1" : 
+          double[] weights1 = {10.0, 15.0, 15.0, 10.0, 5.0, 5.0, 15.0, 5.0, 10.0};
+          Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9};
+      
+          for (int i = 0; i < answers1.length && i < weights1.length; i++) {
+            if (answers1[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers1[i] / 5.0) * weights1[i];
+            }
+          }
+          break;
+        case "level2" :
+           double[] weights2 = {10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 5.0, 10.0, 10.0, 15.0};
+          Integer[] answers2 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+      
+          for (int i = 0; i < answers2.length && i < weights2.length; i++) {
+            if (answers2[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers2[i] / 5.0) * weights2[i];
+            }
+          }
+          break;
+        case "level3" :
+           double[] weights3 = {10.0, 5.0, 5.0, 10.0, 5.0, 20.0, 5.0, 10.0, 15.0, 15.0};
+          Integer[] answers3 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+      
+          for (int i = 0; i < answers3.length && i < weights3.length; i++) {
+            if (answers3[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers3[i] / 5.0) * weights3[i];
+            }
+          }
+        default : {
+          // No additional calculation for undefined levels
+        }
       }
     }
   }
