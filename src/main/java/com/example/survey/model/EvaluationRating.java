@@ -1,13 +1,14 @@
 package com.example.survey.model;
 
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.persistence.Column;
 
 
 @Entity
@@ -127,6 +128,15 @@ public class EvaluationRating {
       case "METAL":
          calculateMetalScore(this.skillSet);
         break;
+      case "METALCUT":
+         calculateMetalCutScore(this.skillSet);
+        break;
+      case "ME-PROJECT":
+         calculateMeProjectScore(this.skillSet);
+        break;
+      case "TEAM-D":
+         calculateTeamDScore(this.skillSet);
+        break;
       default:
         // For unknown form types, use a generic calculation
         calculateGenericScore();
@@ -224,7 +234,7 @@ public class EvaluationRating {
       this.skillSet = skillSet;
       switch (skillSet) {
         case "level1" : 
-          double[] weights1 = {10.0, 10.0, 15.0, 15.0, 5.0, 5.0, 15.0, 5.0, 10.0};
+          double[] weights1 = {15.0, 15.0, 15.0, 15.0, 5.0, 5.0, 15.0, 5.0, 10.0};
           Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9};
       
           for (int i = 0; i < answers1.length && i < weights1.length; i++) {
@@ -271,7 +281,7 @@ public class EvaluationRating {
       this.skillSet = skillSet;
       switch (skillSet) {
         case "level1" : 
-          double[] weights1 = {10.0, 5.0, 5.0, 10.0, 10.0, 10.0, 5.0, 5.0, 15.0, 5.0, 10.0};
+          double[] weights1 = {10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 5.0, 5.0, 15.0, 5.0, 10.0};
           Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11};
       
           for (int i = 0; i < answers1.length && i < weights1.length; i++) {
@@ -318,7 +328,7 @@ public class EvaluationRating {
       this.skillSet = skillSet;
       switch (skillSet) {
         case "level1" : 
-          double[] weights1 = {10.0, 15.0, 15.0, 10.0, 5.0, 5.0, 15.0, 5.0, 10.0};
+          double[] weights1 = {15.0, 15.0, 15.0, 15.0, 5.0, 5.0, 15.0, 5.0, 10.0};
           Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9};
       
           for (int i = 0; i < answers1.length && i < weights1.length; i++) {
@@ -347,6 +357,147 @@ public class EvaluationRating {
             if (answers3[i] != null) {
               // Convert rating (1-5) to percentage of weight
               weightedScore += (answers3[i] / 5.0) * weights3[i];
+            }
+          }
+        default : {
+          // No additional calculation for undefined levels
+        }
+      }
+    }
+  }
+
+  /**
+   * METALCUT scoring (Level1 9 questions, Level2 11 questions, Level3 10 questions)
+   */
+  private void calculateMetalCutScore(String skillSet) {
+    weightedScore = 0.0;
+    if (skillSet != null) {
+      this.skillSet = skillSet;
+      switch (skillSet) {
+        case "level1" : 
+          double[] weights1 = {10.0, 20.0, 20.0, 10.0, 5.0, 5.0, 15.0, 5.0, 10.0};
+          Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9};
+      
+          for (int i = 0; i < answers1.length && i < weights1.length; i++) {
+            if (answers1[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers1[i] / 5.0) * weights1[i];
+            }
+          }
+          break;
+        case "level2" :
+           double[] weights2 = {5.0, 10.0, 10.0, 5.0, 10.0, 10.0, 10.0, 5.0, 10.0, 10.0, 15.0};
+          Integer[] answers2 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11};
+      
+          for (int i = 0; i < answers2.length && i < weights2.length; i++) {
+            if (answers2[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers2[i] / 5.0) * weights2[i];
+            }
+          }
+          break;
+        case "level3" :
+           double[] weights3 = {10.0, 5.0, 5.0, 10.0, 5.0, 20.0, 5.0, 10.0, 15.0, 15.0};
+          Integer[] answers3 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+      
+          for (int i = 0; i < answers3.length && i < weights3.length; i++) {
+            if (answers3[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers3[i] / 5.0) * weights3[i];
+            }
+          }
+        default : {
+          // No additional calculation for undefined levels
+        }
+      }
+    }
+  }
+
+  /**
+   * M&E PROJECT scoring (Level1 10 questions, Level2 9 questions)
+   */
+  private void calculateMeProjectScore(String skillSet) {
+    weightedScore = 0.0;
+    if (skillSet != null) {
+      this.skillSet = skillSet;
+      switch (skillSet) {
+        case "level1" : 
+          double[] weights1 = {15.0, 10.0, 10.0, 10.0, 15.0, 5.0, 5.0, 15.0, 5.0,10.0};
+          Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+      
+          for (int i = 0; i < answers1.length && i < weights1.length; i++) {
+            if (answers1[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers1[i] / 5.0) * weights1[i];
+            }
+          }
+          break;
+        case "level2" :
+           double[] weights2 = {15.0, 10.0, 15.0, 10.0, 10.0, 5.0, 10.0, 10.0, 15.0};
+          Integer[] answers2 = {q1, q2, q3, q4, q5, q6, q7, q8, q9};
+      
+          for (int i = 0; i < answers2.length && i < weights2.length; i++) {
+            if (answers2[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers2[i] / 5.0) * weights2[i];
+            }
+          }
+          break;
+        default : {
+          // No additional calculation for undefined levels
+        }
+      }
+    }
+  }
+
+  /**
+   * TEAM-D scoring (Level1 10 questions, Level2 10 questions, Level3 10 questions, Level4 10 questions)
+   */
+  private void calculateTeamDScore(String skillSet) {
+    weightedScore = 0.0;
+    if (skillSet != null) {
+      this.skillSet = skillSet;
+      switch (skillSet) {
+        case "level1" : 
+          double[] weights1 = {15.0, 15.0, 10.0, 15.0, 5.0, 5.0, 5.0, 15.0, 5.0, 10.0};
+          Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+      
+          for (int i = 0; i < answers1.length && i < weights1.length; i++) {
+            if (answers1[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers1[i] / 5.0) * weights1[i];
+            }
+          }
+          break;
+        case "level2" :
+           double[] weights2 = {10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 5.0, 10.0, 10.0, 15.0};
+          Integer[] answers2 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+      
+          for (int i = 0; i < answers2.length && i < weights2.length; i++) {
+            if (answers2[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers2[i] / 5.0) * weights2[i];
+            }
+          }
+          break;
+        case "level3" :
+           double[] weights3 = {10.0, 5.0, 5.0, 10.0, 5.0, 20.0, 5.0, 10.0, 15.0, 15.0};
+          Integer[] answers3 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+      
+          for (int i = 0; i < answers3.length && i < weights3.length; i++) {
+            if (answers3[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers3[i] / 5.0) * weights3[i];
+            }
+          }
+        case "level4" :
+           double[] weights4 = {10.0, 5.0, 5.0, 10.0, 5.0, 20.0, 5.0, 10.0, 15.0, 15.0};
+          Integer[] answers4 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+      
+          for (int i = 0; i < answers4.length && i < weights4.length; i++) {
+            if (answers4[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers4[i] / 5.0) * weights4[i];
             }
           }
         default : {
