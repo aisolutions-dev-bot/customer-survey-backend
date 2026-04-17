@@ -137,6 +137,9 @@ public class EvaluationRating {
       case "TEAM-D":
          calculateTeamDScore(this.skillSet);
         break;
+      case "PM-EVALUATION":
+        calculatePmEvaluationScore();
+        break;
       default:
         // For unknown form types, use a generic calculation
         calculateGenericScore();
@@ -503,6 +506,21 @@ public class EvaluationRating {
         default : {
           // No additional calculation for undefined levels
         }
+      }
+    }
+  }
+
+  /**
+   * PM-EVALUATION scoring (6 questions)
+   * Q1=30%, Q2=25%, Q3=20%, Q4=15%, Q5=5%, Q6=5%
+   */
+  private void calculatePmEvaluationScore() {
+    double[] weights = {30.0, 25.0, 20.0, 15.0, 5.0, 5.0};
+    Integer[] answers = {q1, q2, q3, q4, q5, q6};
+
+    for (int i = 0; i < answers.length && i < weights.length; i++) {
+      if (answers[i] != null) {
+        weightedScore += (answers[i] / 5.0) * weights[i];
       }
     }
   }
