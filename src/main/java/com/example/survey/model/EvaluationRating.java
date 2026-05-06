@@ -175,19 +175,49 @@ public class EvaluationRating {
   }
 
   /**
-   * CARPENTER scoring (7 questions)
-   * Q1=15%, Q2=35%, Q3=10%, Q4=20%, Q5=10%, Q6=10%, Q7=5%
-   * NOTE: IGNORE CAPRENTER category scoring, it is still using the original scoring in "CarpenterEvaluation.java" class
+   * CARPENTER scoring with level-specific weights
+   * Junior: 9 questions, Journeyman: 11 questions, Senior: 11 questions
+   * Uses normalization formula: (Σ answer × weight) / (5 × Σ weight) × 100
+   * skillSet field stores the level ("JUNIOR", "JOURNEYMAN", "SENIOR")
    */
   private void calculateCarpenterScore() {
-    double[] weights = {15.0, 35.0, 10.0, 20.0, 10.0, 10.0, 5.0};
-    Integer[] answers = {q1, q2, q3, q4, q5, q6, q7};
+    double[] weights;
+    Integer[] answers;
     
-    for (int i = 0; i < answers.length && i < weights.length; i++) {
+    String level = this.skillSet != null ? this.skillSet.toUpperCase() : "";
+    
+    switch (level) {
+      case "JUNIOR":
+        weights = new double[]{15.0, 15.0, 15.0, 15.0, 5.0, 5.0, 15.0, 5.0, 10.0};
+        answers = new Integer[]{q1, q2, q3, q4, q5, q6, q7, q8, q9};
+        break;
+      case "JOURNEYMAN":
+        weights = new double[]{10.0, 10.0, 10.0, 10.0, 5.0, 5.0, 10.0, 5.0, 10.0, 10.0, 15.0};
+        answers = new Integer[]{q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11};
+        break;
+      case "SENIOR":
+        weights = new double[]{10.0, 5.0, 5.0, 5.0, 5.0, 5.0, 20.0, 5.0, 10.0, 15.0, 15.0};
+        answers = new Integer[]{q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11};
+        break;
+      default:
+        // Fallback to junior weights if level unknown
+        weights = new double[]{15.0, 15.0, 15.0, 15.0, 5.0, 5.0, 15.0, 5.0, 10.0};
+        answers = new Integer[]{q1, q2, q3, q4, q5, q6, q7, q8, q9};
+        break;
+    }
+    
+    double rawScore = 0.0;
+    double totalWeight = 0.0;
+    for (int i = 0; i < answers.length; i++) {
       if (answers[i] != null) {
-        // Convert rating (1-5) to percentage of weight
-        weightedScore += (answers[i] / 5.0) * weights[i];
+        rawScore += answers[i] * weights[i];
+        totalWeight += weights[i];
       }
+    }
+    
+    double maxScore = 5.0 * totalWeight;
+    if (maxScore > 0) {
+      weightedScore = Math.round((rawScore / maxScore) * 100.0);
     }
   }
 
