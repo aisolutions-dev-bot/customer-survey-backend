@@ -59,6 +59,15 @@ public class EvaluationRatingService {
         rating.setQ9(request.getQ9());
         rating.setQ10(request.getQ10());
         rating.setQ11(request.getQ11());
+        rating.setQ12(request.getQ12());
+        rating.setQ13(request.getQ13());
+        rating.setQ14(request.getQ14());
+        rating.setQ15(request.getQ15());
+        rating.setQ16(request.getQ16());
+        rating.setQ17(request.getQ17());
+        rating.setQ18(request.getQ18());
+        rating.setQ19(request.getQ19());
+        rating.setQ20(request.getQ20());
         
         return rating;
     }
