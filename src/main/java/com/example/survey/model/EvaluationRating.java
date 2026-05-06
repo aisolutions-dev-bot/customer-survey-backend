@@ -217,7 +217,7 @@ public class EvaluationRating {
     
     double maxScore = 5.0 * totalWeight;
     if (maxScore > 0) {
-      weightedScore = Math.round((rawScore / maxScore) * 100.0);
+      weightedScore = (double) Math.round((rawScore / maxScore) * 100.0);
     }
   }
 
