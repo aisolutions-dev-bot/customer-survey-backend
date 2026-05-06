@@ -81,6 +81,33 @@ public class EvaluationRating {
   @Column(name = "q11")
   private Integer q11;
 
+  @Column(name = "q12")
+  private Integer q12;
+
+  @Column(name = "q13")
+  private Integer q13;
+
+  @Column(name = "q14")
+  private Integer q14;
+
+  @Column(name = "q15")
+  private Integer q15;
+
+  @Column(name = "q16")
+  private Integer q16;
+
+  @Column(name = "q17")
+  private Integer q17;
+
+  @Column(name = "q18")
+  private Integer q18;
+
+  @Column(name = "q19")
+  private Integer q19;
+
+  @Column(name = "q20")
+  private Integer q20;
+
   // Constructors
   public EvaluationRating() {
   }
@@ -707,6 +734,78 @@ public class EvaluationRating {
 
   public void setQ11(Integer q11) {
     this.q11 = q11;
+  }
+
+  public Integer getQ12() {
+    return q12;
+  }
+
+  public void setQ12(Integer q12) {
+    this.q12 = q12;
+  }
+
+  public Integer getQ13() {
+    return q13;
+  }
+
+  public void setQ13(Integer q13) {
+    this.q13 = q13;
+  }
+
+  public Integer getQ14() {
+    return q14;
+  }
+
+  public void setQ14(Integer q14) {
+    this.q14 = q14;
+  }
+
+  public Integer getQ15() {
+    return q15;
+  }
+
+  public void setQ15(Integer q15) {
+    this.q15 = q15;
+  }
+
+  public Integer getQ16() {
+    return q16;
+  }
+
+  public void setQ16(Integer q16) {
+    this.q16 = q16;
+  }
+
+  public Integer getQ17() {
+    return q17;
+  }
+
+  public void setQ17(Integer q17) {
+    this.q17 = q17;
+  }
+
+  public Integer getQ18() {
+    return q18;
+  }
+
+  public void setQ18(Integer q18) {
+    this.q18 = q18;
+  }
+
+  public Integer getQ19() {
+    return q19;
+  }
+
+  public void setQ19(Integer q19) {
+    this.q19 = q19;
+  }
+
+  public Integer getQ20() {
+    return q20;
+  }
+
+  public void setQ20(Integer q20) {
+    this.q20 = q20;
   }
 
   @Override

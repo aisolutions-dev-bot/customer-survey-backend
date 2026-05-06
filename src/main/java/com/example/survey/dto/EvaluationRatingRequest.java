@@ -25,6 +25,15 @@ public class EvaluationRatingRequest {
     private Integer q9;
     private Integer q10;
     private Integer q11;
+    private Integer q12;
+    private Integer q13;
+    private Integer q14;
+    private Integer q15;
+    private Integer q16;
+    private Integer q17;
+    private Integer q18;
+    private Integer q19;
+    private Integer q20;
     
     // Constructors
     public EvaluationRatingRequest() {
@@ -35,7 +44,9 @@ public class EvaluationRatingRequest {
                                    String formType, String carpenterLevel, Double weightedScore,
                                    String remarks, Integer q1, Integer q2, Integer q3, Integer q4,
                                    Integer q5, Integer q6, Integer q7, Integer q8, Integer q9,
-                                   Integer q10, Integer q11) {
+                                   Integer q10, Integer q11, Integer q12, Integer q13, Integer q14,
+                                   Integer q15, Integer q16, Integer q17, Integer q18, Integer q19,
+                                   Integer q20) {
         this.staffId = staffId;
         this.projectId = projectId;
         this.projectName = projectName;
@@ -57,6 +68,15 @@ public class EvaluationRatingRequest {
         this.q9 = q9;
         this.q10 = q10;
         this.q11 = q11;
+        this.q12 = q12;
+        this.q13 = q13;
+        this.q14 = q14;
+        this.q15 = q15;
+        this.q16 = q16;
+        this.q17 = q17;
+        this.q18 = q18;
+        this.q19 = q19;
+        this.q20 = q20;
     }
 
     // Getters and Setters
@@ -228,6 +248,78 @@ public class EvaluationRatingRequest {
         this.q11 = q11;
     }
 
+    public Integer getQ12() {
+        return q12;
+    }
+
+    public void setQ12(Integer q12) {
+        this.q12 = q12;
+    }
+
+    public Integer getQ13() {
+        return q13;
+    }
+
+    public void setQ13(Integer q13) {
+        this.q13 = q13;
+    }
+
+    public Integer getQ14() {
+        return q14;
+    }
+
+    public void setQ14(Integer q14) {
+        this.q14 = q14;
+    }
+
+    public Integer getQ15() {
+        return q15;
+    }
+
+    public void setQ15(Integer q15) {
+        this.q15 = q15;
+    }
+
+    public Integer getQ16() {
+        return q16;
+    }
+
+    public void setQ16(Integer q16) {
+        this.q16 = q16;
+    }
+
+    public Integer getQ17() {
+        return q17;
+    }
+
+    public void setQ17(Integer q17) {
+        this.q17 = q17;
+    }
+
+    public Integer getQ18() {
+        return q18;
+    }
+
+    public void setQ18(Integer q18) {
+        this.q18 = q18;
+    }
+
+    public Integer getQ19() {
+        return q19;
+    }
+
+    public void setQ19(Integer q19) {
+        this.q19 = q19;
+    }
+
+    public Integer getQ20() {
+        return q20;
+    }
+
+    public void setQ20(Integer q20) {
+        this.q20 = q20;
+    }
+
     @Override
     public String toString() {
         return "EvaluationRatingRequest{" +
@@ -242,7 +334,11 @@ public class EvaluationRatingRequest {
                 ", weightedScore=" + weightedScore +
                 ", q1=" + q1 + ", q2=" + q2 + ", q3=" + q3 +
                 ", q4=" + q4 + ", q5=" + q5 + ", q6=" + q6 +
-                ", q7=" + q7 +
+                ", q7=" + q7 + ", q8=" + q8 + ", q9=" + q9 +
+                ", q10=" + q10 + ", q11=" + q11 +
+                ", q12=" + q12 + ", q13=" + q13 + ", q14=" + q14 +
+                ", q15=" + q15 + ", q16=" + q16 + ", q17=" + q17 +
+                ", q18=" + q18 + ", q19=" + q19 + ", q20=" + q20 +
                 '}';
     }
 }
