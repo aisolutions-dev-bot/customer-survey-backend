@@ -550,8 +550,9 @@ public class EvaluationRating {
               weightedScore += (answers3[i] / 5.0) * weights3[i];
             }
           }
+          break;
         case "level4" :
-           double[] weights4 = {10.0, 5.0, 5.0, 10.0, 5.0, 20.0, 5.0, 10.0, 15.0, 15.0};
+           double[] weights4 = {5.0, 5.0, 5.0, 10.0, 10.0, 20.0, 5.0, 10.0, 15.0, 15.0};
           Integer[] answers4 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
       
           for (int i = 0; i < answers4.length && i < weights4.length; i++) {
@@ -560,6 +561,7 @@ public class EvaluationRating {
               weightedScore += (answers4[i] / 5.0) * weights4[i];
             }
           }
+          break;
         default : {
           // No additional calculation for undefined levels
         }
