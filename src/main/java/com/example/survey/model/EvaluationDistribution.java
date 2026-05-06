@@ -53,6 +53,10 @@ public class EvaluationDistribution {
   @JsonProperty("skillSet")
   private String skillSet; // Values: 'junior', 'journeyman', 'senior'
 
+  @Column(name = "FormType", length = 25)
+  @JsonProperty("formType")
+  private String formType;
+
   // NEW: Status field
   @Column(name = "Status")
   @JsonProperty("status")

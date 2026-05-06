@@ -25,7 +25,8 @@ public interface EvaluationDistributionRepository extends JpaRepository<Evaluati
           evaluatorStaff.Name   AS evaluatorName,
           COALESCE(e.SkillSet, f.SkillSet) AS skillSet,
           e.Status,
-          e.GroupId
+          e.GroupId,
+          e.FormType
       FROM m17EvaluationDistributionMgmt e
       LEFT JOIN m03Staff evalStaff
              ON e.EvaluateeId = evalStaff.staffId

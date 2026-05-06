@@ -24,4 +24,6 @@ public interface EvaluationDistributionFullDTO {
   String getStatus();
 
   Integer getGroupId();
+
+  String getFormType();
 }
