@@ -8,13 +8,18 @@ import org.springframework.stereotype.Service;
 
 import com.example.survey.dto.EvaluationRatingRequest;
 import com.example.survey.model.EvaluationRating;
+import com.example.survey.model.EvaluationRatingsDuplication;
 import com.example.survey.repository.EvaluationRatingRepository;
+import com.example.survey.repository.EvaluationRatingsDuplicationRepository;
 
 @Service
 public class EvaluationRatingService {
 
     @Autowired
     private EvaluationRatingRepository repository;
+
+    @Autowired
+    private EvaluationRatingsDuplicationRepository duplicationRepository;
 
     /**
      * Save evaluation rating from request DTO
@@ -27,7 +32,49 @@ public class EvaluationRatingService {
             rating.calculateWeightedScore();
         }
         
-        return repository.save(rating);
+        EvaluationRating savedRating = repository.save(rating);
+        
+        // Auto-create duplicate evaluation rating records
+        if (request.getEvaluationDistributionMgmtUniqId() != null) {
+            List<EvaluationRatingsDuplication> dupList =
+                duplicationRepository.findByEvaluationDistributionMgmtUniqId(request.getEvaluationDistributionMgmtUniqId());
+            
+            for (EvaluationRatingsDuplication dup : dupList) {
+                EvaluationRating dupRating = new EvaluationRating();
+                dupRating.setEvaluateeId(dup.getDuplicateStaffId());
+                dupRating.setProjectCode(savedRating.getProjectCode());
+                dupRating.setDepartmentId(savedRating.getDepartmentId());
+                dupRating.setEvaluatorId(savedRating.getEvaluatorId());
+                dupRating.setFormType(savedRating.getFormType());
+                dupRating.setSkillSet(savedRating.getSkillSet());
+                dupRating.setWeightedScore(savedRating.getWeightedScore());
+                dupRating.setRemarks(savedRating.getRemarks());
+                dupRating.setSubmittedAt(savedRating.getSubmittedAt());
+                dupRating.setQ1(savedRating.getQ1());
+                dupRating.setQ2(savedRating.getQ2());
+                dupRating.setQ3(savedRating.getQ3());
+                dupRating.setQ4(savedRating.getQ4());
+                dupRating.setQ5(savedRating.getQ5());
+                dupRating.setQ6(savedRating.getQ6());
+                dupRating.setQ7(savedRating.getQ7());
+                dupRating.setQ8(savedRating.getQ8());
+                dupRating.setQ9(savedRating.getQ9());
+                dupRating.setQ10(savedRating.getQ10());
+                dupRating.setQ11(savedRating.getQ11());
+                dupRating.setQ12(savedRating.getQ12());
+                dupRating.setQ13(savedRating.getQ13());
+                dupRating.setQ14(savedRating.getQ14());
+                dupRating.setQ15(savedRating.getQ15());
+                dupRating.setQ16(savedRating.getQ16());
+                dupRating.setQ17(savedRating.getQ17());
+                dupRating.setQ18(savedRating.getQ18());
+                dupRating.setQ19(savedRating.getQ19());
+                dupRating.setQ20(savedRating.getQ20());
+                repository.save(dupRating);
+            }
+        }
+        
+        return savedRating;
     }
 
     /**

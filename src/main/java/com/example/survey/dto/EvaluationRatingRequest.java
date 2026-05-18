@@ -13,6 +13,8 @@ public class EvaluationRatingRequest {
     private Double weightedScore;     // Maps to WeightedScore
     private String remarks;           // Maps to Remarks
     
+    private Integer evaluationDistributionMgmtUniqId;  // FK to m17EvaluationDistributionMgmt
+    
     // Question answers
     private Integer q1;
     private Integer q2;
@@ -150,6 +152,14 @@ public class EvaluationRatingRequest {
 
     public void setWeightedScore(Double weightedScore) {
         this.weightedScore = weightedScore;
+    }
+
+    public Integer getEvaluationDistributionMgmtUniqId() {
+        return evaluationDistributionMgmtUniqId;
+    }
+
+    public void setEvaluationDistributionMgmtUniqId(Integer evaluationDistributionMgmtUniqId) {
+        this.evaluationDistributionMgmtUniqId = evaluationDistributionMgmtUniqId;
     }
 
     public String getRemarks() {
@@ -332,6 +342,7 @@ public class EvaluationRatingRequest {
                 ", formType='" + formType + '\'' +
                 ", carpenterLevel='" + carpenterLevel + '\'' +
                 ", weightedScore=" + weightedScore +
+                ", evaluationDistributionMgmtUniqId=" + evaluationDistributionMgmtUniqId +
                 ", q1=" + q1 + ", q2=" + q2 + ", q3=" + q3 +
                 ", q4=" + q4 + ", q5=" + q5 + ", q6=" + q6 +
                 ", q7=" + q7 + ", q8=" + q8 + ", q9=" + q9 +
