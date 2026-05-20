@@ -18,6 +18,11 @@ public class FormConfigController {
   @Autowired
   private EvaluationFormTypeDetQuestRepository repository;
 
+  @GetMapping("/{formType}/skill-sets")
+  public ResponseEntity<List<String>> getSkillSets(@PathVariable String formType) {
+    return ResponseEntity.ok(repository.findDistinctSkillSetsByFormType(formType.toUpperCase()));
+  }
+
   @GetMapping("/{formType}/{skillSet}")
   public ResponseEntity<List<FormQuestionDTO>> getFormQuestions(
       @PathVariable String formType,
