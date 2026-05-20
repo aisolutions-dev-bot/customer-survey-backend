@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.survey.dto.EvaluationRatingRequest;
+import com.example.survey.model.EvaluationFormTypeDetQuest;
 import com.example.survey.model.EvaluationRating;
 import com.example.survey.model.EvaluationRatingsDuplication;
+import com.example.survey.repository.EvaluationFormTypeDetQuestRepository;
 import com.example.survey.repository.EvaluationRatingRepository;
 import com.example.survey.repository.EvaluationRatingsDuplicationRepository;
 
@@ -21,15 +23,26 @@ public class EvaluationRatingService {
     @Autowired
     private EvaluationRatingsDuplicationRepository duplicationRepository;
 
+    @Autowired
+    private EvaluationFormTypeDetQuestRepository formQuestRepository;
+
     /**
      * Save evaluation rating from request DTO
      */
     public EvaluationRating saveEvaluationRating(EvaluationRatingRequest request) {
         EvaluationRating rating = mapRequestToEntity(request);
-        
-        // Calculate weighted score if not provided
+
+        // Calculate weighted score from DB weights; fall back to hardcoded if not found
         if (rating.getWeightedScore() == null || rating.getWeightedScore() == 0.0) {
-            rating.calculateWeightedScore();
+            List<EvaluationFormTypeDetQuest> questions = formQuestRepository
+                .findByFormTypeAndSkillSetOrderByQuestionNumber(
+                    rating.getFormType() != null ? rating.getFormType().toUpperCase() : "",
+                    rating.getSkillSet() != null ? rating.getSkillSet().toUpperCase() : "");
+            if (!questions.isEmpty()) {
+                rating.setWeightedScore(calculateScoreFromDb(rating, questions));
+            } else {
+                rating.calculateWeightedScore();
+            }
         }
         
         EvaluationRating savedRating = repository.save(rating);
@@ -75,6 +88,26 @@ public class EvaluationRatingService {
         }
         
         return savedRating;
+    }
+
+    private double calculateScoreFromDb(EvaluationRating rating, List<EvaluationFormTypeDetQuest> questions) {
+        Integer[] answers = {
+            rating.getQ1(), rating.getQ2(), rating.getQ3(), rating.getQ4(), rating.getQ5(),
+            rating.getQ6(), rating.getQ7(), rating.getQ8(), rating.getQ9(), rating.getQ10(),
+            rating.getQ11(), rating.getQ12(), rating.getQ13(), rating.getQ14(), rating.getQ15(),
+            rating.getQ16(), rating.getQ17(), rating.getQ18(), rating.getQ19(), rating.getQ20()
+        };
+        double rawScore = 0.0;
+        double totalWeight = 0.0;
+        for (EvaluationFormTypeDetQuest q : questions) {
+            int idx = q.getQuestionNumber() - 1;
+            if (idx >= 0 && idx < answers.length && answers[idx] != null && q.getWeightedScore() != null) {
+                rawScore += answers[idx] * q.getWeightedScore();
+                totalWeight += q.getWeightedScore();
+            }
+        }
+        double maxScore = 5.0 * totalWeight;
+        return maxScore > 0 ? Math.round((rawScore / maxScore) * 100.0) : 0.0;
     }
 
     /**
