@@ -1,6 +1,7 @@
 package com.example.survey.model;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -115,7 +116,7 @@ public class EvaluationRating {
   @PrePersist
   protected void onCreate() {
     if (submittedAt == null) {
-      submittedAt = LocalDateTime.now();
+      submittedAt = LocalDateTime.now(ZoneId.of("Asia/Singapore"));
     }
   }
 
