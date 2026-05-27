@@ -3,6 +3,8 @@ package com.example.survey.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.aisolutions.shared.util.DateUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -125,7 +127,7 @@ public class EvaluationRatingService {
         rating.setSkillSet(request.getCarpenterLevel());
         rating.setWeightedScore(request.getWeightedScore());
         rating.setRemarks(request.getRemarks());
-        rating.setSubmittedAt(LocalDateTime.now());
+        rating.setSubmittedAt(DateUtil.nowSGT());
         
         // Map question answers
         rating.setQ1(request.getQ1());

@@ -3,6 +3,8 @@ package com.example.survey.model;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+import com.aisolutions.shared.util.DateUtil;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -113,11 +115,11 @@ public class EvaluationRating {
   public EvaluationRating() {
   }
 
-  @PrePersist
-  protected void onCreate() {
-    if (submittedAt == null) {
-      submittedAt = LocalDateTime.now(ZoneId.of("Asia/Singapore"));
-    }
+    @PrePersist
+    public void prePersist() {
+        if (submittedAt == null) {
+            submittedAt = DateUtil.nowSGT();
+        }
   }
 
   /**

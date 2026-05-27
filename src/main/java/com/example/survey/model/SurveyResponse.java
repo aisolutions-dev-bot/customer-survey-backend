@@ -2,6 +2,8 @@ package com.example.survey.model;
 
 import java.time.LocalDateTime;
 
+import com.aisolutions.shared.util.DateUtil;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,7 +20,7 @@ public class SurveyResponse {
 
     private Integer q1, q2, q3, q4, q5, q6, q7, q8, q9, q10;
 
-    private LocalDateTime submittedAt = LocalDateTime.now();
+    private LocalDateTime submittedAt = DateUtil.nowSGT();
 
     // Getters and setters omitted for brevity
     public long getId() { return id; };

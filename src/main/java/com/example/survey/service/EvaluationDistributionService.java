@@ -10,7 +10,7 @@ import com.example.survey.model.EvaluationDistribution;
 import com.example.survey.model.EvaluationDistributionNonProj;
 import com.example.survey.repository.EvaluationDistributionRepository;
 import com.example.survey.repository.EvaluationDistributionNonProjRepository;
-import com.example.survey.util.DateUtil;
+import com.aisolutions.shared.util.DateUtil;
 
 @Service
 public class EvaluationDistributionService {

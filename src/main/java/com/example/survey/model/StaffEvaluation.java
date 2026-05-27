@@ -2,6 +2,8 @@ package com.example.survey.model;
 
 import java.time.LocalDateTime;
 
+import com.aisolutions.shared.util.DateUtil;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,7 +30,7 @@ public class StaffEvaluation {
     private Integer q5; // dependabilityInitiative 10%
     private Integer q6; // communicationResponsiveness 10%
     private Double weightedScore;
-    private LocalDateTime submittedAt = LocalDateTime.now();
+    private LocalDateTime submittedAt = DateUtil.nowSGT();
     
     // Default constructor
     public StaffEvaluation() {}
@@ -78,7 +80,7 @@ public class StaffEvaluation {
 
     @PrePersist
     protected void onCreate() {
-        submittedAt = LocalDateTime.now();
+        submittedAt = DateUtil.nowSGT();
         calculateWeightedScore();
     }
     
