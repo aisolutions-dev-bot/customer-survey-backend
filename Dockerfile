@@ -1,28 +1,34 @@
 # ---- Build Stage ----
-FROM eclipse-temurin:21-jdk AS build
+FROM gradle:9.1.0-jdk21 AS build
 
 WORKDIR /app
 
-# Copy Gradle wrapper + settings first (better layer caching)
+# GitHub credentials required for resolving ai-solutions-java-shared from GitHub Packages
+# Set GITHUB_ACTOR and GITHUB_TOKEN in Railway Dashboard → Build Secrets
+ARG GITHUB_ACTOR
+ARG GITHUB_TOKEN
+
+# Copy build config first (layer caching)
 COPY gradlew ./
-COPY gradle gradle
+COPY gradle/ gradle/
 COPY build.gradle settings.gradle ./
 
-# Give permission to gradlew
-RUN chmod +x gradlew
+# Make Gradle wrapper executable
+RUN chmod +x ./gradlew
 
-# Download dependencies (cached if build.gradle/settings.gradle unchanged)
-RUN ./gradlew --version
-RUN ./gradlew dependencies --no-daemon || true
+# Pre-fetch dependencies with GitHub Packages auth
+RUN GITHUB_ACTOR=$GITHUB_ACTOR GITHUB_TOKEN=$GITHUB_TOKEN \
+  ./gradlew dependencies --no-daemon || true
 
 # Copy full source
 COPY . .
 
-# Ensure gradlew is executable (AFTER full copy)
+# Ensure gradlew is still executable after full copy
 RUN chmod +x gradlew
 
-# Build Spring Boot fat JAR (skip tests to speed up)
-RUN ./gradlew clean bootJar -x test -x check --no-daemon
+# Build Spring Boot fat JAR with GitHub Packages auth
+RUN GITHUB_ACTOR=$GITHUB_ACTOR GITHUB_TOKEN=$GITHUB_TOKEN \
+  ./gradlew clean bootJar -x test -x check --no-daemon
 
 # ---- Run Stage ----
 FROM eclipse-temurin:21-jre
