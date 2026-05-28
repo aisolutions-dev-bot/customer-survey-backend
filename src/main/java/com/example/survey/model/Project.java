@@ -3,6 +3,8 @@ package com.example.survey.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
@@ -74,5 +76,15 @@ public class Project {
                 ", clientName='" + clientName + '\'' +
                 ", status='" + status + '\'' +
                 '}';
+    }
+
+    @PrePersist
+    @PreUpdate
+    void validateProjectIdLength() {
+        if (this.projectId != null && this.projectId.length() > 25) {
+            throw new IllegalArgumentException(
+                "projectId exceeds maximum length of 25 characters (got " + this.projectId.length() + ")"
+            );
+        }
     }
 }

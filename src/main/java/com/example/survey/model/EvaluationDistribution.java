@@ -9,6 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -69,5 +71,15 @@ public class EvaluationDistribution {
   @Column(name = "SubmitDate")
   @JsonProperty("submitDate")
   private LocalDateTime submitDate;
+
+  @PrePersist
+  @PreUpdate
+  void validateProjectIdLength() {
+    if (this.projectId != null && this.projectId.length() > 25) {
+      throw new IllegalArgumentException(
+          "projectId exceeds maximum length of 25 characters (got " + this.projectId.length() + ")"
+      );
+    }
+  }
 
 }

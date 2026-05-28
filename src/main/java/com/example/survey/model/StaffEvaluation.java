@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 
 @Entity
 public class StaffEvaluation {
@@ -91,5 +92,15 @@ public class StaffEvaluation {
         // Each question max is 5, so weighted_score = (q * weight/5)
         weightedScore = (q1 * 4.0) + (q2 * 6.0) + (q3 * 4.0) + 
                        (q4 * 2.0) + (q5 * 2.0) + (q6 * 2.0);
+    }
+
+    @PrePersist
+    @PreUpdate
+    void validateProjectIdLength() {
+        if (this.projectId != null && this.projectId.length() > 25) {
+            throw new IllegalArgumentException(
+                "projectId exceeds maximum length of 25 characters (got " + this.projectId.length() + ")"
+            );
+        }
     }
 }
