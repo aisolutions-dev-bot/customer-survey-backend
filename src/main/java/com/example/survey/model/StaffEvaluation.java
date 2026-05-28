@@ -84,9 +84,19 @@ public class StaffEvaluation {
     @PrePersist
     protected void onCreate() {
         submittedAt = DateUtil.nowSGT();
-        calculateWeightedScore();
+        calculateAndValidate();
     }
-    
+
+    @PreUpdate
+    protected void onUpdate() {
+        validateProjectIdLength();
+    }
+
+    private void calculateAndValidate() {
+        calculateWeightedScore();
+        validateProjectIdLength();
+    }
+
     private void calculateWeightedScore() {
         // Weight percentages: q1=20%, q2=30%, q3=20%, q4=10%, q5=10%, q6=10%
         // Each question max is 5, so weighted_score = (q * weight/5)
@@ -94,9 +104,7 @@ public class StaffEvaluation {
                        (q4 * 2.0) + (q5 * 2.0) + (q6 * 2.0);
     }
 
-    @PrePersist
-    @PreUpdate
-    void validateProjectIdLength() {
+    private void validateProjectIdLength() {
         if (this.projectId != null && this.projectId.length() > 25) {
             throw new IllegalArgumentException(
                 "Project Code exceeds maximum length of 25 characters (got " + this.projectId.length() + ")"
