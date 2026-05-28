@@ -77,7 +77,7 @@ public class EvaluationDistribution {
   void validateProjectIdLength() {
     if (this.projectId != null && this.projectId.length() > 25) {
       throw new IllegalArgumentException(
-          "projectId exceeds maximum length of 25 characters (got " + this.projectId.length() + ")"
+          "Project Code exceeds maximum length of 25 characters (got " + this.projectId.length() + ")"
       );
     }
   }
