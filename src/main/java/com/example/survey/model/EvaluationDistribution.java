@@ -33,7 +33,7 @@ public class EvaluationDistribution {
   @JsonProperty("evaluateeId")
   private String evaluateeId;
 
-  @Column(name = "ProjectId")
+  @Column(name = "ProjectId", length = 25)
   @JsonProperty("projectId")
   private String projectId;
 

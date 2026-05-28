@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.aisolutions.shared.util.DateUtil;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,6 +18,7 @@ public class StaffEvaluation {
     private Long id;
     
     private String staffId;
+    @Column(length = 25)
     private String projectId;
     private String roleType; // "drafter", "engineer", etc.
     private String evaluatorId; // Unique identifier for each evaluation

@@ -35,7 +35,7 @@ public class EvaluationDistributionNonProj {
   @Column(name = "DepartmentId")
   private String departmentId;
 
-  @Column(name = "ProjectId")
+  @Column(name = "ProjectId", length = 25)
   private String projectId;
 
   @Column(name = "EvaluatorId")

@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 public class Project {
     
     @Id
-    @Column(name = "ProjectCode", nullable = false)
+    @Column(name = "ProjectCode", length = 25, nullable = false)
     private String projectId;
     
     @Column(name = "ProjectName")
