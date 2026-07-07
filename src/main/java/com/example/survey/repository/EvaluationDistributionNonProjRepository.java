@@ -18,7 +18,7 @@ public interface EvaluationDistributionNonProjRepository extends JpaRepository<E
           e.EvaluateeId,
           evalStaff.Name        AS evaluateeName,
           e.ProjectId,
-          e.ProjectId           AS projectName,
+          COALESCE(e.ProjectName, e.ProjectId) AS projectName,
           e.DepartmentId,
           d.departmentName      AS departmentName,
           e.EvaluatorId,
