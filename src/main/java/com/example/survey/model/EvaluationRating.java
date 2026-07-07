@@ -51,6 +51,9 @@ public class EvaluationRating {
   @Column(name = "Remarks", length = 8000)
   private String remarks;
 
+  @Column(name = "DuplicationSourceId", length = 25)
+  private String duplicationSourceId;
+
   @Column(name = "q1")
   private Integer q1;
 
@@ -681,6 +684,14 @@ public class EvaluationRating {
 
   public void setRemarks(String remarks) {
     this.remarks = remarks;
+  }
+
+  public String getDuplicationSourceId() {
+    return duplicationSourceId;
+  }
+
+  public void setDuplicationSourceId(String duplicationSourceId) {
+    this.duplicationSourceId = duplicationSourceId;
   }
 
   public Integer getQ1() {

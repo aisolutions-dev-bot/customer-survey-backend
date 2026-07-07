@@ -57,6 +57,7 @@ public class EvaluationRatingService {
             for (EvaluationRatingsDuplication dup : dupList) {
                 EvaluationRating dupRating = new EvaluationRating();
                 dupRating.setEvaluateeId(dup.getDuplicateStaffId());
+                dupRating.setDuplicationSourceId(savedRating.getEvaluateeId());
                 dupRating.setProjectCode(savedRating.getProjectCode());
                 dupRating.setDepartmentId(savedRating.getDepartmentId());
                 dupRating.setEvaluatorId(savedRating.getEvaluatorId());
