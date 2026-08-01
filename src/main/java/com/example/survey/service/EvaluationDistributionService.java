@@ -42,8 +42,29 @@ public class EvaluationDistributionService {
   }
 
   /**
+   * Create a SUBMITTED distribution row for a duplicated staff member,
+   * copying metadata from the original distribution row.
+   */
+  public void createSubmittedForDuplicate(EvaluationDistribution original, String duplicateStaffId) {
+    if (original == null) return;
+    EvaluationDistribution dup = EvaluationDistribution.builder()
+        .evaluateeId(duplicateStaffId)
+        .projectId(original.getProjectId())
+        .departmentId(original.getDepartmentId())
+        .evaluatorId(original.getEvaluatorId())
+        .evaluatorName(original.getEvaluatorName())
+        .skillSet(original.getSkillSet())
+        .formType(original.getFormType())
+        .groupId(original.getGroupId())
+        .status("SUBMITTED")
+        .submitDate(DateUtil.nowSGT())
+        .build();
+    evaluationDistributionRepository.save(dup);
+  }
+
+  /**
    * Update the status of an evaluation distribution
-   * 
+   *
    * @param uniqId The unique ID of the evaluation distribution
    * @param status The new status value (e.g., "SUBMITTED", "PENDING",
    *               "COMPLETED")
