@@ -11,12 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.survey.dto.EvaluationRatingRequest;
 import com.example.survey.model.EvaluationDistribution;
+import com.example.survey.model.EvaluationDistributionNonProj;
 import com.example.survey.model.EvaluationFormTypeDetQuest;
 import com.example.survey.model.EvaluationRating;
 import com.example.survey.model.EvaluationRatingsDuplication;
 import com.example.survey.repository.EvaluationFormTypeDetQuestRepository;
 import com.example.survey.repository.EvaluationRatingRepository;
 import com.example.survey.repository.EvaluationRatingsDuplicationRepository;
+import com.example.survey.service.notification.EvaluationCompletedNotificationService;
 
 @Service
 public class EvaluationRatingService {
@@ -32,6 +34,9 @@ public class EvaluationRatingService {
 
     @Autowired
     private EvaluationDistributionService distributionService;
+
+    @Autowired
+    private EvaluationCompletedNotificationService evaluationCompletedNotificationService;
 
     /**
      * Save evaluation rating from request DTO
@@ -58,6 +63,9 @@ public class EvaluationRatingService {
         EvaluationDistribution originalDist = null;
         if (request.getEvaluationDistributionMgmtUniqId() != null) {
             originalDist = distributionService.updateStatus(request.getEvaluationDistributionMgmtUniqId(), "SUBMITTED");
+            if (originalDist == null) {
+                notifyIfNonProjectSubmission(request.getEvaluationDistributionMgmtUniqId(), savedRating);
+            }
         }
 
         // Auto-create duplicate evaluation rating records + their SUBMITTED distribution rows
@@ -103,6 +111,20 @@ public class EvaluationRatingService {
         }
 
         return savedRating;
+    }
+
+    /**
+     * The submitted uniqId didn't match the project distribution table, so this
+     * is a non-project submission. Updates the non-project row's status and, if
+     * that row exists, fires the completion notification (email/sms/whatsapp)
+     * to the evaluator.
+     */
+    private void notifyIfNonProjectSubmission(Integer evaluationDistributionUniqId, EvaluationRating savedRating) {
+        EvaluationDistributionNonProj nonProjDist =
+            distributionService.updateNonProjectStatus(evaluationDistributionUniqId, "SUBMITTED");
+        if (nonProjDist != null) {
+            evaluationCompletedNotificationService.notifyEvaluatorOfCompletion(nonProjDist, savedRating);
+        }
     }
 
     private double calculateScoreFromDb(EvaluationRating rating, List<EvaluationFormTypeDetQuest> questions) {
