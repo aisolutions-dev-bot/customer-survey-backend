@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '3.3.5'
+    id 'org.springframework.boot' version '3.5.4'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'java'
 }
@@ -9,7 +9,7 @@ version = '1.0.0'
 sourceCompatibility = '21' */
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)  // or 21 if you need
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -29,14 +29,15 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation "org.springframework.boot:spring-boot-starter-validation"
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 
-    compileOnly"org.projectlombok:lombok:1.18.30"
-    annotationProcessor"org.projectlombok:lombok:1.18.30"
+    compileOnly "org.projectlombok:lombok:1.18.42"
+    annotationProcessor "org.projectlombok:lombok:1.18.42"
 
-    implementation 'com.aisolutions:ai-solutions-java-shared:0.0.5'
+    implementation 'com.aisolutions:ai-solutions-java-shared:0.1.1'
 
 }
 

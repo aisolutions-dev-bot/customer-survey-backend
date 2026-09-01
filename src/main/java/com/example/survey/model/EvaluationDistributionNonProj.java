@@ -40,6 +40,9 @@ public class EvaluationDistributionNonProj {
   @Column(name = "ProjectId", length = 25)
   private String projectId;
 
+  @Column(name = "ProjectName", length = 100)
+  private String projectName;
+
   @Column(name = "EvaluatorId")
   private String evaluatorId;
 

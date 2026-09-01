@@ -1,5 +1,5 @@
 # ---- Build Stage ----
-FROM gradle:9.1.0-jdk21 AS build
+FROM gradle:9.1.0-jdk25 AS build
 
 WORKDIR /app
 
@@ -31,7 +31,7 @@ RUN GITHUB_ACTOR=$GITHUB_ACTOR GITHUB_TOKEN=$GITHUB_TOKEN \
   ./gradlew clean bootJar -x test -x check --no-daemon
 
 # ---- Run Stage ----
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre-jammy
 
 WORKDIR /app
 

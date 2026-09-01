@@ -4,10 +4,13 @@ import java.time.LocalDateTime;
 
 import com.aisolutions.shared.util.DateUtil;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 
 @Entity
 public class SurveyResponse {
@@ -16,6 +19,8 @@ public class SurveyResponse {
     private Long id;
 
     private String customerId;
+
+    @Column(length = 25)
     private String projectId;
 
     private Integer q1, q2, q3, q4, q5, q6, q7, q8, q9, q10;
@@ -65,4 +70,14 @@ public class SurveyResponse {
     
     public LocalDateTime getSubmittedAt() { return submittedAt; }
     public void setSubmittedAt(LocalDateTime submittedAt) { this.submittedAt = submittedAt; }
+
+    @PrePersist
+    @PreUpdate
+    void validateProjectIdLength() {
+        if (this.projectId != null && this.projectId.length() > 25) {
+            throw new IllegalArgumentException(
+                "Project Code exceeds maximum length of 25 characters (got " + this.projectId.length() + ")"
+            );
+        }
+    }
 }

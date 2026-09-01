@@ -42,39 +42,66 @@ public class EvaluationDistributionService {
   }
 
   /**
-   * Update the status of an evaluation distribution
-   * 
+   * Create a SUBMITTED distribution row for a duplicated staff member,
+   * copying metadata from the original distribution row.
+   */
+  public void createSubmittedForDuplicate(EvaluationDistribution original, String duplicateStaffId) {
+    if (original == null) return;
+    EvaluationDistribution dup = EvaluationDistribution.builder()
+        .evaluateeId(duplicateStaffId)
+        .projectId(original.getProjectId())
+        .departmentId(original.getDepartmentId())
+        .evaluatorId(original.getEvaluatorId())
+        .evaluatorName(original.getEvaluatorName())
+        .skillSet(original.getSkillSet())
+        .formType(original.getFormType())
+        .groupId(original.getGroupId())
+        .status("SUBMITTED")
+        .submitDate(DateUtil.nowSGT())
+        .build();
+    evaluationDistributionRepository.save(dup);
+  }
+
+  /**
+   * Update the status of a project evaluation distribution row.
+   * Does NOT touch the non-project table — use updateNonProjectStatus for that.
+   *
    * @param uniqId The unique ID of the evaluation distribution
-   * @param status The new status value (e.g., "SUBMITTED", "PENDING",
-   *               "COMPLETED")
-   * @return The updated EvaluationDistribution or null if not found
+   * @param status The new status value (e.g., "SUBMITTED", "PENDING")
+   * @return The updated EvaluationDistribution, or null if no project row matched
    */
   public EvaluationDistribution updateStatus(Integer uniqId, String status) {
     EvaluationDistribution distribution = evaluationDistributionRepository.findById(uniqId).orElse(null);
-
-    if (distribution != null) {
-      distribution.setStatus(status);
-
-      if ("SUBMITTED".equalsIgnoreCase(status) && distribution.getSubmitDate() == null) {
-        distribution.setSubmitDate(DateUtil.nowSGT());
-      }
-
-      return evaluationDistributionRepository.save(distribution);
+    if (distribution == null) {
+      return null;
     }
 
-    // Fall back to non-project table
+    distribution.setStatus(status);
+    if ("SUBMITTED".equalsIgnoreCase(status) && distribution.getSubmitDate() == null) {
+      distribution.setSubmitDate(DateUtil.nowSGT());
+    }
+
+    return evaluationDistributionRepository.save(distribution);
+  }
+
+  /**
+   * Update the status of a non-project evaluation distribution row.
+   *
+   * @param uniqId The unique ID of the evaluation distribution
+   * @param status The new status value (e.g., "SUBMITTED", "PENDING")
+   * @return The updated EvaluationDistributionNonProj, or null if no non-project row matched
+   */
+  public EvaluationDistributionNonProj updateNonProjectStatus(Integer uniqId, String status) {
     EvaluationDistributionNonProj nonProj = evaluationDistributionNonProjRepository.findById(uniqId).orElse(null);
-
-    if (nonProj != null) {
-      nonProj.setStatus(status);
-
-      if ("SUBMITTED".equalsIgnoreCase(status) && nonProj.getSubmitDate() == null) {
-        nonProj.setSubmitDate(DateUtil.nowSGT());
-      }
-
-      evaluationDistributionNonProjRepository.save(nonProj);
+    if (nonProj == null) {
+      return null;
     }
 
-    return null;
+    nonProj.setStatus(status);
+    if ("SUBMITTED".equalsIgnoreCase(status) && nonProj.getSubmitDate() == null) {
+      nonProj.setSubmitDate(DateUtil.nowSGT());
+    }
+
+    return evaluationDistributionNonProjRepository.save(nonProj);
   }
 }

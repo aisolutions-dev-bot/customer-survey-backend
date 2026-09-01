@@ -7,14 +7,18 @@ import com.aisolutions.shared.util.DateUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.survey.dto.EvaluationRatingRequest;
+import com.example.survey.model.EvaluationDistribution;
+import com.example.survey.model.EvaluationDistributionNonProj;
 import com.example.survey.model.EvaluationFormTypeDetQuest;
 import com.example.survey.model.EvaluationRating;
 import com.example.survey.model.EvaluationRatingsDuplication;
 import com.example.survey.repository.EvaluationFormTypeDetQuestRepository;
 import com.example.survey.repository.EvaluationRatingRepository;
 import com.example.survey.repository.EvaluationRatingsDuplicationRepository;
+import com.example.survey.service.notification.EvaluationCompletedNotificationService;
 
 @Service
 public class EvaluationRatingService {
@@ -28,9 +32,16 @@ public class EvaluationRatingService {
     @Autowired
     private EvaluationFormTypeDetQuestRepository formQuestRepository;
 
+    @Autowired
+    private EvaluationDistributionService distributionService;
+
+    @Autowired
+    private EvaluationCompletedNotificationService evaluationCompletedNotificationService;
+
     /**
      * Save evaluation rating from request DTO
      */
+    @Transactional
     public EvaluationRating saveEvaluationRating(EvaluationRatingRequest request) {
         EvaluationRating rating = mapRequestToEntity(request);
 
@@ -48,12 +59,20 @@ public class EvaluationRatingService {
         }
         
         EvaluationRating savedRating = repository.save(rating);
-        
-        // Auto-create duplicate evaluation rating records
+
+        EvaluationDistribution originalDist = null;
+        if (request.getEvaluationDistributionMgmtUniqId() != null) {
+            originalDist = distributionService.updateStatus(request.getEvaluationDistributionMgmtUniqId(), "SUBMITTED");
+            if (originalDist == null) {
+                notifyIfNonProjectSubmission(request.getEvaluationDistributionMgmtUniqId(), savedRating);
+            }
+        }
+
+        // Auto-create duplicate evaluation rating records + their SUBMITTED distribution rows
         if (request.getEvaluationDistributionMgmtUniqId() != null) {
             List<EvaluationRatingsDuplication> dupList =
                 duplicationRepository.findByEvaluationDistributionMgmtUniqId(request.getEvaluationDistributionMgmtUniqId());
-            
+
             for (EvaluationRatingsDuplication dup : dupList) {
                 EvaluationRating dupRating = new EvaluationRating();
                 dupRating.setEvaluateeId(dup.getDuplicateStaffId());
@@ -87,10 +106,25 @@ public class EvaluationRatingService {
                 dupRating.setQ19(savedRating.getQ19());
                 dupRating.setQ20(savedRating.getQ20());
                 repository.save(dupRating);
+                distributionService.createSubmittedForDuplicate(originalDist, dup.getDuplicateStaffId());
             }
         }
-        
+
         return savedRating;
+    }
+
+    /**
+     * The submitted uniqId didn't match the project distribution table, so this
+     * is a non-project submission. Updates the non-project row's status and, if
+     * that row exists, fires the completion notification (email/sms/whatsapp)
+     * to the evaluator.
+     */
+    private void notifyIfNonProjectSubmission(Integer evaluationDistributionUniqId, EvaluationRating savedRating) {
+        EvaluationDistributionNonProj nonProjDist =
+            distributionService.updateNonProjectStatus(evaluationDistributionUniqId, "SUBMITTED");
+        if (nonProjDist != null) {
+            evaluationCompletedNotificationService.notifyEvaluatorOfCompletion(nonProjDist, savedRating);
+        }
     }
 
     private double calculateScoreFromDb(EvaluationRating rating, List<EvaluationFormTypeDetQuest> questions) {
