@@ -29,7 +29,9 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation('org.springframework.boot:spring-boot-starter-mail') {
+        exclude group: 'org.eclipse.angus', module: 'jakarta.mail'
+    }
     implementation "org.springframework.boot:spring-boot-starter-validation"
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
@@ -38,6 +40,7 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:1.18.42"
 
     implementation 'com.aisolutions:ai-solutions-java-shared:0.1.1'
+    implementation 'com.sun.mail:jakarta.mail:2.0.1'
 
 }
 
