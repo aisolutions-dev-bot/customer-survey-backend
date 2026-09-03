@@ -39,6 +39,15 @@ public class EvaluationRating {
   @Column(name = "SkillSet", length = 50)
   private String skillSet;
 
+  // Which version of the formType's question set this rating was scored against
+  // (e.g. "v1", "v2" — see bs-proj-question-versions.ts on the frontend for the
+  // BS-PROJECT audit trail). Null for ratings submitted before versioning existed.
+  // Never recompute or reinterpret an old rating under a newer version's questions —
+  // always resolve wording via the version stamped here, mirroring the insert-only
+  // audit pattern (UserAuditTrail / WhatsappAuditLog) used elsewhere in this codebase.
+  @Column(name = "QuestionSetVersion", length = 10)
+  private String questionSetVersion;
+
   @Column(name = "WeightedScore")
   private Double weightedScore;
 
@@ -230,6 +239,12 @@ public class EvaluationRating {
   /**
    * Business Support- PROJECT scoring (7 questions)
    * Q1=15%, Q2=35%, Q3=10%, Q4=10%, Q5=10%, Q6=10%, Q7=10%
+   * Per-slot weights are unchanged between question-set v1 and v2 (see
+   * questionSetVersion / bs-proj-question-versions.ts on the frontend), so this
+   * formula does not need to branch on version. What Q5/Q6/Q7 *mean* differs by
+   * version (v1: Documental-Internal/Documental-External/Responsive-to-Enquiries;
+   * v2: Documental-Combined/Responsive-to-Enquiries/Collaboration-with-Other-Teams)
+   * — resolve that meaning via questionSetVersion when displaying, never here.
    */
   private void calculateBsProjectScore() {
     double[] weights = {15.0, 35.0, 10.0, 10.0, 10.0, 10.0, 10.0};
@@ -652,6 +667,14 @@ public class EvaluationRating {
 
   public void setSkillSet(String skillSet) {
     this.skillSet = skillSet;
+  }
+
+  public String getQuestionSetVersion() {
+    return questionSetVersion;
+  }
+
+  public void setQuestionSetVersion(String questionSetVersion) {
+    this.questionSetVersion = questionSetVersion;
   }
 
   public Double getWeightedScore() {

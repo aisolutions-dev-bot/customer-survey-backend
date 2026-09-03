@@ -2,6 +2,7 @@ package com.example.survey.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import com.aisolutions.shared.util.DateUtil;
 
@@ -37,6 +38,16 @@ public class EvaluationRatingService {
 
     @Autowired
     private EvaluationCompletedNotificationService evaluationCompletedNotificationService;
+
+    // Source of truth for "which question-set version is currently live" per formType.
+    // Must be kept in sync with the frontend's *-question-versions.ts registry
+    // (e.g. bs-proj-question-versions.ts -> BS_PROJECT_ACTIVE_VERSION) whenever a
+    // new version is published. Stamped on every new rating server-side so it can't
+    // be forged/omitted by an older or misbehaving client; existing rows before this
+    // column existed stay null, which callers must treat as "v1" for BS-PROJECT.
+    private static final Map<String, String> ACTIVE_QUESTION_SET_VERSION = Map.of(
+        "BS-PROJECT", "v2"
+    );
 
     /**
      * Save evaluation rating from request DTO
@@ -161,6 +172,9 @@ public class EvaluationRatingService {
         rating.setFormType(request.getFormType());
         rating.setSkillSet(request.getCarpenterLevel());
         rating.setWeightedScore(request.getWeightedScore());
+        rating.setQuestionSetVersion(
+            ACTIVE_QUESTION_SET_VERSION.get(
+                request.getFormType() != null ? request.getFormType().toUpperCase() : ""));
         rating.setRemarks(request.getRemarks());
         rating.setSubmittedAt(DateUtil.nowSGT());
         
