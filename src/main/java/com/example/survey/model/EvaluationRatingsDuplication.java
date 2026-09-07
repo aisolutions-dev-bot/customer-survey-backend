@@ -21,6 +21,9 @@ public class EvaluationRatingsDuplication {
     @Column(name = "EvaluationDistributionMgmtUniqId", nullable = false)
     private Integer evaluationDistributionMgmtUniqId;
 
+    @Column(name = "DistributionType", length = 11, nullable = false)
+    private String distributionType;
+
     @Column(name = "DuplicateStaffId", length = 25, nullable = false)
     private String duplicateStaffId;
 
@@ -47,6 +50,14 @@ public class EvaluationRatingsDuplication {
 
     public void setEvaluationDistributionMgmtUniqId(Integer evaluationDistributionMgmtUniqId) {
         this.evaluationDistributionMgmtUniqId = evaluationDistributionMgmtUniqId;
+    }
+
+    public String getDistributionType() {
+        return distributionType;
+    }
+
+    public void setDistributionType(String distributionType) {
+        this.distributionType = distributionType;
     }
 
     public String getDuplicateStaffId() {

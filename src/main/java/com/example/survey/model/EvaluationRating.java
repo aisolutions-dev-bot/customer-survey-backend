@@ -30,6 +30,9 @@ public class EvaluationRating {
   @Column(name = "ProjectCode", length = 25)
   private String projectCode;
 
+  @Column(name = "LinkProjId", length = 25)
+  private String linkProjId;
+
   @Column(name = "EvaluateeId", length = 25)
   private String evaluateeId;
 
@@ -62,6 +65,12 @@ public class EvaluationRating {
 
   @Column(name = "DuplicationSourceId", length = 25)
   private String duplicationSourceId;
+
+  @Column(name = "DistributionUniqId")
+  private Long distributionUniqId;
+
+  @Column(name = "DistributionType", length = 11)
+  private String distributionType;
 
   @Column(name = "q1")
   private Integer q1;
@@ -645,6 +654,14 @@ public class EvaluationRating {
     this.projectCode = projectCode;
   }
 
+  public String getLinkProjId() {
+    return linkProjId;
+  }
+
+  public void setLinkProjId(String linkProjId) {
+    this.linkProjId = linkProjId;
+  }
+
   public String getEvaluateeId() {
     return evaluateeId;
   }
@@ -715,6 +732,22 @@ public class EvaluationRating {
 
   public void setDuplicationSourceId(String duplicationSourceId) {
     this.duplicationSourceId = duplicationSourceId;
+  }
+
+  public Long getDistributionUniqId() {
+    return distributionUniqId;
+  }
+
+  public void setDistributionUniqId(Long distributionUniqId) {
+    this.distributionUniqId = distributionUniqId;
+  }
+
+  public String getDistributionType() {
+    return distributionType;
+  }
+
+  public void setDistributionType(String distributionType) {
+    this.distributionType = distributionType;
   }
 
   public Integer getQ1() {
@@ -883,6 +916,7 @@ public class EvaluationRating {
         "uniqId=" + uniqId +
         ", evaluatorId='" + evaluatorId + '\'' +
         ", projectCode='" + projectCode + '\'' +
+        ", linkProjId='" + linkProjId + '\'' +
         ", evaluateeId='" + evaluateeId + '\'' +
         ", formType='" + formType + '\'' +
         ", skillSet='" + skillSet + '\'' +

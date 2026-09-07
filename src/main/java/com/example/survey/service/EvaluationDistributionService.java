@@ -63,6 +63,29 @@ public class EvaluationDistributionService {
   }
 
   /**
+   * Create a SUBMITTED non-project distribution row for a duplicated staff member,
+   * copying metadata (including the linked project, if any) from the original row.
+   */
+  public void createSubmittedForNonProjectDuplicate(EvaluationDistributionNonProj original, String duplicateStaffId) {
+    if (original == null) return;
+    EvaluationDistributionNonProj dup = EvaluationDistributionNonProj.builder()
+        .evaluateeId(duplicateStaffId)
+        .projectId(original.getProjectId())
+        .projectName(original.getProjectName())
+        .linkProjId(original.getLinkProjId())
+        .departmentId(original.getDepartmentId())
+        .evaluatorId(original.getEvaluatorId())
+        .evaluatorName(original.getEvaluatorName())
+        .skillSet(original.getSkillSet())
+        .formType(original.getFormType())
+        .groupId(original.getGroupId())
+        .status("SUBMITTED")
+        .submitDate(DateUtil.nowSGT())
+        .build();
+    evaluationDistributionNonProjRepository.save(dup);
+  }
+
+  /**
    * Update the status of a project evaluation distribution row.
    * Does NOT touch the non-project table — use updateNonProjectStatus for that.
    *

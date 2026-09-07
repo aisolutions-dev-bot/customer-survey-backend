@@ -26,4 +26,8 @@ public interface EvaluationDistributionFullDTO {
   Integer getGroupId();
 
   String getFormType();
+
+  String getDistributionType(); // "PROJECT" or "NON_PROJECT" - which distribution table this row came from
+
+  String getLinkProjId(); // Linked project code (Non-Project distributions only); null for Project distributions
 }

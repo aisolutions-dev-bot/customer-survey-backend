@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -71,6 +72,15 @@ public class EvaluationDistribution {
   @Column(name = "SubmitDate")
   @JsonProperty("submitDate")
   private LocalDateTime submitDate;
+
+  // Not a DB column - this entity only ever represents rows from the Project
+  // table (m17EvaluationDistributionMgmt), so this is always "PROJECT". Exists
+  // for parity with EvaluationDistributionFullDTO.distributionType so callers of
+  // getByUniqId() can rely on the same field name across both response shapes.
+  @Transient
+  @Builder.Default
+  @JsonProperty("distributionType")
+  private String distributionType = "PROJECT";
 
   @PrePersist
   @PreUpdate

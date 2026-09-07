@@ -4,6 +4,7 @@ public class EvaluationRatingRequest {
     
     private String staffId;           // Maps to EvaluateeId
     private String projectId;         // Maps to ProjectCode
+    private String linkProjId;        // Maps to LinkProjId (linked project, Non-Project distributions only)
     private String projectName;       // Not stored in m17EvaluationRatings
     private String departmentId;      // Maps to DepartmentId
     private String evaluatorId;       // Maps to EvaluatorId
@@ -14,6 +15,7 @@ public class EvaluationRatingRequest {
     private String remarks;           // Maps to Remarks
     
     private Integer evaluationDistributionMgmtUniqId;  // FK to m17EvaluationDistributionMgmt
+    private String distributionType;  // "PROJECT" or "NON_PROJECT" - routes which distribution table to update
     
     // Question answers
     private Integer q1;
@@ -98,6 +100,14 @@ public class EvaluationRatingRequest {
         this.projectId = projectId;
     }
 
+    public String getLinkProjId() {
+        return linkProjId;
+    }
+
+    public void setLinkProjId(String linkProjId) {
+        this.linkProjId = linkProjId;
+    }
+
     public String getProjectName() {
         return projectName;
     }
@@ -160,6 +170,14 @@ public class EvaluationRatingRequest {
 
     public void setEvaluationDistributionMgmtUniqId(Integer evaluationDistributionMgmtUniqId) {
         this.evaluationDistributionMgmtUniqId = evaluationDistributionMgmtUniqId;
+    }
+
+    public String getDistributionType() {
+        return distributionType;
+    }
+
+    public void setDistributionType(String distributionType) {
+        this.distributionType = distributionType;
     }
 
     public String getRemarks() {
@@ -335,6 +353,7 @@ public class EvaluationRatingRequest {
         return "EvaluationRatingRequest{" +
                 "staffId='" + staffId + '\'' +
                 ", projectId='" + projectId + '\'' +
+                ", linkProjId='" + linkProjId + '\'' +
                 ", projectName='" + projectName + '\'' +
                 ", departmentId='" + departmentId + '\'' +
                 ", evaluatorId='" + evaluatorId + '\'' +
@@ -343,6 +362,7 @@ public class EvaluationRatingRequest {
                 ", carpenterLevel='" + carpenterLevel + '\'' +
                 ", weightedScore=" + weightedScore +
                 ", evaluationDistributionMgmtUniqId=" + evaluationDistributionMgmtUniqId +
+                ", distributionType='" + distributionType + '\'' +
                 ", q1=" + q1 + ", q2=" + q2 + ", q3=" + q3 +
                 ", q4=" + q4 + ", q5=" + q5 + ", q6=" + q6 +
                 ", q7=" + q7 + ", q8=" + q8 + ", q9=" + q9 +

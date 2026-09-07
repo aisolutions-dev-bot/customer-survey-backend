@@ -10,5 +10,6 @@ import com.example.survey.model.EvaluationRatingsDuplication;
 @Repository
 public interface EvaluationRatingsDuplicationRepository extends JpaRepository<EvaluationRatingsDuplication, Long> {
 
-    List<EvaluationRatingsDuplication> findByEvaluationDistributionMgmtUniqId(Integer evaluationDistributionMgmtUniqId);
+    List<EvaluationRatingsDuplication> findByEvaluationDistributionMgmtUniqIdAndDistributionType(
+        Integer evaluationDistributionMgmtUniqId, String distributionType);
 }

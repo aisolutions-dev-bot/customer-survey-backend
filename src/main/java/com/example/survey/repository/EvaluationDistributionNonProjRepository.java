@@ -26,7 +26,9 @@ public interface EvaluationDistributionNonProjRepository extends JpaRepository<E
           COALESCE(e.SkillSet, f.SkillSet) AS skillSet,
           e.Status,
           e.GroupId,
-          e.FormType
+          e.FormType,
+          'NON_PROJECT' AS distributionType,
+          e.LinkProjId
       FROM m17EvaluationDistNonProj e
       LEFT JOIN m03Staff evalStaff
              ON e.EvaluateeId = evalStaff.staffId

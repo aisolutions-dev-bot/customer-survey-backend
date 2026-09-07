@@ -45,8 +45,19 @@ public class EvaluationRatingService {
     // new version is published. Stamped on every new rating server-side so it can't
     // be forged/omitted by an older or misbehaving client; existing rows before this
     // column existed stay null, which callers must treat as "v1" for BS-PROJECT.
-    private static final Map<String, String> ACTIVE_QUESTION_SET_VERSION = Map.of(
-        "BS-PROJECT", "v2"
+    private static final Map<String, String> ACTIVE_QUESTION_SET_VERSION = Map.ofEntries(
+        Map.entry("BS-PROJECT", "v2"),
+        Map.entry("BS-TENDER", "v1"),
+        Map.entry("CARPENTER", "v1"),
+        Map.entry("CEILING", "v1"),
+        Map.entry("DRAFTER", "v1"),
+        Map.entry("ME-PROJECT", "v1"),
+        Map.entry("METAL", "v1"),
+        Map.entry("METALCUT", "v1"),
+        Map.entry("OPERATION", "v1"),
+        Map.entry("PROJECT-MANAGER", "v1"),
+        Map.entry("SPRAYPAINT", "v1"),
+        Map.entry("TEAM-D", "v1")
     );
 
     /**
@@ -72,28 +83,51 @@ public class EvaluationRatingService {
         EvaluationRating savedRating = repository.save(rating);
 
         EvaluationDistribution originalDist = null;
+        EvaluationDistributionNonProj originalNonProjDist = null;
         if (request.getEvaluationDistributionMgmtUniqId() != null) {
-            originalDist = distributionService.updateStatus(request.getEvaluationDistributionMgmtUniqId(), "SUBMITTED");
-            if (originalDist == null) {
-                notifyIfNonProjectSubmission(request.getEvaluationDistributionMgmtUniqId(), savedRating);
+            String distributionType = request.getDistributionType();
+            if ("NON_PROJECT".equalsIgnoreCase(distributionType)) {
+                // Explicit routing: this is a Non-Project distribution, update that table directly.
+                originalNonProjDist = notifyIfNonProjectSubmission(request.getEvaluationDistributionMgmtUniqId(), savedRating);
+            } else if ("PROJECT".equalsIgnoreCase(distributionType)) {
+                // Explicit routing: this is a Project distribution, update that table directly.
+                originalDist = distributionService.updateStatus(request.getEvaluationDistributionMgmtUniqId(), "SUBMITTED");
+            } else {
+                // Transitional fallback for old clients that haven't been updated to send
+                // distributionType yet. Project and Non-Project distributions have independent
+                // AUTO_INCREMENT UniqIds that can collide across tables, so this guess-based
+                // routing (try Project first, fall back to Non-Project) can update the WRONG
+                // row when a Non-Project UniqId happens to collide with an unrelated Project
+                // UniqId. Remove this branch once all frontends send distributionType.
+                originalDist = distributionService.updateStatus(request.getEvaluationDistributionMgmtUniqId(), "SUBMITTED");
+                if (originalDist == null) {
+                    originalNonProjDist = notifyIfNonProjectSubmission(request.getEvaluationDistributionMgmtUniqId(), savedRating);
+                }
             }
         }
 
-        // Auto-create duplicate evaluation rating records + their SUBMITTED distribution rows
+        // Auto-create duplicate evaluation rating records + their SUBMITTED distribution rows.
+        // Distribution type must be explicit here too -- Project and Non-Project UniqIds collide,
+        // so a bare UniqId lookup risks pulling duplication config from an unrelated record.
         if (request.getEvaluationDistributionMgmtUniqId() != null) {
+            String dupDistributionType = request.getDistributionType() != null
+                ? request.getDistributionType().toUpperCase() : "PROJECT";
             List<EvaluationRatingsDuplication> dupList =
-                duplicationRepository.findByEvaluationDistributionMgmtUniqId(request.getEvaluationDistributionMgmtUniqId());
+                duplicationRepository.findByEvaluationDistributionMgmtUniqIdAndDistributionType(
+                    request.getEvaluationDistributionMgmtUniqId(), dupDistributionType);
 
             for (EvaluationRatingsDuplication dup : dupList) {
                 EvaluationRating dupRating = new EvaluationRating();
                 dupRating.setEvaluateeId(dup.getDuplicateStaffId());
                 dupRating.setDuplicationSourceId(savedRating.getEvaluateeId());
                 dupRating.setProjectCode(savedRating.getProjectCode());
+                dupRating.setLinkProjId(savedRating.getLinkProjId());
                 dupRating.setDepartmentId(savedRating.getDepartmentId());
                 dupRating.setEvaluatorId(savedRating.getEvaluatorId());
                 dupRating.setFormType(savedRating.getFormType());
                 dupRating.setSkillSet(savedRating.getSkillSet());
                 dupRating.setWeightedScore(savedRating.getWeightedScore());
+                dupRating.setQuestionSetVersion(savedRating.getQuestionSetVersion());
                 dupRating.setRemarks(savedRating.getRemarks());
                 dupRating.setSubmittedAt(savedRating.getSubmittedAt());
                 dupRating.setQ1(savedRating.getQ1());
@@ -117,7 +151,11 @@ public class EvaluationRatingService {
                 dupRating.setQ19(savedRating.getQ19());
                 dupRating.setQ20(savedRating.getQ20());
                 repository.save(dupRating);
-                distributionService.createSubmittedForDuplicate(originalDist, dup.getDuplicateStaffId());
+                if (originalNonProjDist != null) {
+                    distributionService.createSubmittedForNonProjectDuplicate(originalNonProjDist, dup.getDuplicateStaffId());
+                } else {
+                    distributionService.createSubmittedForDuplicate(originalDist, dup.getDuplicateStaffId());
+                }
             }
         }
 
@@ -130,12 +168,13 @@ public class EvaluationRatingService {
      * that row exists, fires the completion notification (email/sms/whatsapp)
      * to the evaluator.
      */
-    private void notifyIfNonProjectSubmission(Integer evaluationDistributionUniqId, EvaluationRating savedRating) {
+    private EvaluationDistributionNonProj notifyIfNonProjectSubmission(Integer evaluationDistributionUniqId, EvaluationRating savedRating) {
         EvaluationDistributionNonProj nonProjDist =
             distributionService.updateNonProjectStatus(evaluationDistributionUniqId, "SUBMITTED");
         if (nonProjDist != null) {
             evaluationCompletedNotificationService.notifyEvaluatorOfCompletion(nonProjDist, savedRating);
         }
+        return nonProjDist;
     }
 
     private double calculateScoreFromDb(EvaluationRating rating, List<EvaluationFormTypeDetQuest> questions) {
@@ -167,6 +206,7 @@ public class EvaluationRatingService {
         // Map fields from request to entity
         rating.setEvaluateeId(request.getStaffId());
         rating.setProjectCode(request.getProjectId());
+        rating.setLinkProjId(request.getLinkProjId());
         rating.setDepartmentId(request.getDepartmentId());
         rating.setEvaluatorId(request.getEvaluatorId());
         rating.setFormType(request.getFormType());
@@ -177,7 +217,11 @@ public class EvaluationRatingService {
                 request.getFormType() != null ? request.getFormType().toUpperCase() : ""));
         rating.setRemarks(request.getRemarks());
         rating.setSubmittedAt(DateUtil.nowSGT());
-        
+        rating.setDistributionUniqId(
+            request.getEvaluationDistributionMgmtUniqId() != null
+                ? request.getEvaluationDistributionMgmtUniqId().longValue() : null);
+        rating.setDistributionType(request.getDistributionType());
+
         // Map question answers
         rating.setQ1(request.getQ1());
         rating.setQ2(request.getQ2());
