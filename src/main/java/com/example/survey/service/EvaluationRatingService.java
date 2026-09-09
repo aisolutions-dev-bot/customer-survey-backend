@@ -119,6 +119,21 @@ public class EvaluationRatingService {
             }
         }
 
+        // Stamp DistributionType/DistributionUniqId from which routing branch actually resolved
+        // a row above -- not from request.getDistributionType() -- since that's the authoritative
+        // outcome (including the transitional guess-based fallback), rather than trusting whatever
+        // a possibly-legacy client claims. Lets every future read path (Overview, Score Report,
+        // Detailed Listing) resolve the real project association without re-guessing.
+        if (originalDist != null) {
+            rating.setDistributionType("PROJECT");
+            rating.setDistributionUniqId(request.getEvaluationDistributionMgmtUniqId().longValue());
+            repository.save(rating);
+        } else if (originalNonProjDist != null) {
+            rating.setDistributionType("NON_PROJECT");
+            rating.setDistributionUniqId(request.getEvaluationDistributionMgmtUniqId().longValue());
+            repository.save(rating);
+        }
+
         // Auto-create duplicate evaluation rating records + their SUBMITTED distribution rows.
         // Distribution type must be explicit here too -- Project and Non-Project UniqIds collide,
         // so a bare UniqId lookup risks pulling duplication config from an unrelated record.
