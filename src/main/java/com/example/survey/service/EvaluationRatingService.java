@@ -67,6 +67,19 @@ public class EvaluationRatingService {
     public EvaluationRating saveEvaluationRating(EvaluationRatingRequest request) {
         EvaluationRating rating = mapRequestToEntity(request);
 
+        // LinkProjId must come from the distribution record itself, never the client --
+        // several legacy per-form-type submission components never populate/send this field,
+        // which would otherwise silently save LinkProjId=NULL even though the distribution
+        // row it came from has it set, breaking Eval Overview's score lookup for that project.
+        if (request.getEvaluationDistributionMgmtUniqId() != null
+                && !"PROJECT".equalsIgnoreCase(request.getDistributionType())) {
+            EvaluationDistributionNonProj nonProjForLink =
+                distributionService.getNonProjectByUniqId(request.getEvaluationDistributionMgmtUniqId());
+            if (nonProjForLink != null) {
+                rating.setLinkProjId(nonProjForLink.getLinkProjId());
+            }
+        }
+
         // Calculate weighted score from DB weights; fall back to hardcoded if not found
         if (rating.getWeightedScore() == null || rating.getWeightedScore() == 0.0) {
             List<EvaluationFormTypeDetQuest> questions = formQuestRepository

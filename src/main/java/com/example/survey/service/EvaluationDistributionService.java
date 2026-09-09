@@ -30,6 +30,13 @@ public class EvaluationDistributionService {
   }
 
   /**
+   * Get a non-project evaluation distribution row by uniqId from m17EvaluationDistNonProj.
+   */
+  public EvaluationDistributionNonProj getNonProjectByUniqId(Integer uniqId) {
+    return evaluationDistributionNonProjRepository.findById(uniqId).orElse(null);
+  }
+
+  /**
    * Get pending evaluation distribution by groupId.
    * Tries m17EvaluationDistributionMgmt first, falls back to m17EvaluationDistNonProj.
    */
