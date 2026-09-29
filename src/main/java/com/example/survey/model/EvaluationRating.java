@@ -363,7 +363,8 @@ public class EvaluationRating {
   }
 
   /**
-   * SPRAYPAINT scoring (Level1 11 questions, Level2 11 questions, Level3 11 questions)
+   * SPRAYPAINT scoring (Level1 11 questions, Level2 11 questions, Level3 11 questions,
+   * Level4 10 questions)
    */
   private void calculateSpraypaintScore(String skillSet) {
     weightedScore = 0.0;
@@ -395,13 +396,25 @@ public class EvaluationRating {
         case "level3" :
            double[] weights3 = {5.0, 10.0, 5.0, 5.0, 5.0, 5.0, 20.0, 5.0, 10.0, 15.0, 15.0};
           Integer[] answers3 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11};
-      
+
           for (int i = 0; i < answers3.length && i < weights3.length; i++) {
             if (answers3[i] != null) {
               // Convert rating (1-5) to percentage of weight
               weightedScore += (answers3[i] / 5.0) * weights3[i];
             }
           }
+          break;
+        case "level4" :
+           double[] weights4 = {5.0, 10.0, 5.0, 5.0, 10.0, 20.0, 5.0, 10.0, 15.0, 15.0};
+          Integer[] answers4 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
+
+          for (int i = 0; i < answers4.length && i < weights4.length; i++) {
+            if (answers4[i] != null) {
+              // Convert rating (1-5) to percentage of weight
+              weightedScore += (answers4[i] / 5.0) * weights4[i];
+            }
+          }
+          break;
         default : {
           // No additional calculation for undefined levels
         }
