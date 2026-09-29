@@ -322,7 +322,7 @@ public class EvaluationRating {
     weightedScore = 0.0;
     if (skillSet != null) {
       this.skillSet = skillSet;
-      switch (skillSet) {
+      switch (skillSet.toLowerCase()) {
         case "level1" : 
           double[] weights1 = {15.0, 15.0, 15.0, 15.0, 5.0, 5.0, 15.0, 5.0, 10.0};
           Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9};
@@ -355,6 +355,7 @@ public class EvaluationRating {
               weightedScore += (answers3[i] / 5.0) * weights3[i];
             }
           }
+          break;
         default : {
           // No additional calculation for undefined levels
         }
@@ -370,7 +371,7 @@ public class EvaluationRating {
     weightedScore = 0.0;
     if (skillSet != null) {
       this.skillSet = skillSet;
-      switch (skillSet) {
+      switch (skillSet.toLowerCase()) {
         case "level1" : 
           double[] weights1 = {10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 5.0, 5.0, 15.0, 5.0, 10.0};
           Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11};
@@ -429,7 +430,7 @@ public class EvaluationRating {
     weightedScore = 0.0;
     if (skillSet != null) {
       this.skillSet = skillSet;
-      switch (skillSet) {
+      switch (skillSet.toLowerCase()) {
         case "level1" : 
           double[] weights1 = {15.0, 15.0, 15.0, 15.0, 5.0, 5.0, 15.0, 5.0, 10.0};
           Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9};
@@ -462,6 +463,7 @@ public class EvaluationRating {
               weightedScore += (answers3[i] / 5.0) * weights3[i];
             }
           }
+          break;
         default : {
           // No additional calculation for undefined levels
         }
@@ -476,7 +478,7 @@ public class EvaluationRating {
     weightedScore = 0.0;
     if (skillSet != null) {
       this.skillSet = skillSet;
-      switch (skillSet) {
+      switch (skillSet.toLowerCase()) {
         case "level1" : 
           double[] weights1 = {10.0, 20.0, 20.0, 10.0, 5.0, 5.0, 15.0, 5.0, 10.0};
           Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9};
@@ -509,6 +511,7 @@ public class EvaluationRating {
               weightedScore += (answers3[i] / 5.0) * weights3[i];
             }
           }
+          break;
         default : {
           // No additional calculation for undefined levels
         }
@@ -523,7 +526,7 @@ public class EvaluationRating {
     weightedScore = 0.0;
     if (skillSet != null) {
       this.skillSet = skillSet;
-      switch (skillSet) {
+      switch (skillSet.toLowerCase()) {
         case "level1" : 
           double[] weights1 = {15.0, 10.0, 10.0, 10.0, 15.0, 5.0, 5.0, 15.0, 5.0,10.0};
           Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
@@ -560,7 +563,7 @@ public class EvaluationRating {
     weightedScore = 0.0;
     if (skillSet != null) {
       this.skillSet = skillSet;
-      switch (skillSet) {
+      switch (skillSet.toLowerCase()) {
         case "level1" : 
           double[] weights1 = {15.0, 15.0, 10.0, 15.0, 5.0, 5.0, 5.0, 15.0, 5.0, 10.0};
           Integer[] answers1 = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10};
