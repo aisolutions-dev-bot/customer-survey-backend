@@ -23,15 +23,12 @@ public class TenantResolver {
   }
 
   /**
-   * Resolves the tenant {@code companyId} names.
-   *
-   * <p>A company with no database of its own resolves to an identity whose
-   * database name is null, which routes the request to the default datasource
-   * while still recording which company it belongs to.
+   * Resolves the tenant {@code companyId} names, binding no database when the
+   * company has none of its own.
    *
    * @param companyId the company from the {@code c} query parameter or the {@code X-Company-Id} header
    * @return the tenant to bind to the request
-   * @throws CompanyDbLookupException when org-api could not say which database the company owns
+   * @throws CompanyDbLookupException when org-api did not answer
    */
   public TenantContext.TenantIdentity resolveFromCompanyId(String companyId) {
     Optional<String> databaseName = companyDbLookupService.lookupDatabaseName(companyId);

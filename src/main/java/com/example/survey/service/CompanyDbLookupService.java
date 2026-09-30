@@ -12,12 +12,8 @@ import com.example.survey.tenancy.CompanyDbLookupException;
 /**
  * Resolves a company's database name, caching answers briefly because
  * company-to-database mappings change very rarely while evaluation traffic
- * arrives constantly.
- *
- * <p>Only real answers are cached, including org-api's 404 for a company with
- * no database of its own. Lookup failures are never cached, so a transient
- * org-api outage cannot be remembered as "this company has no database" and
- * quietly route the company to the default database.
+ * arrives constantly. Only answers from org-api are cached; a lookup that
+ * failed is never remembered.
  */
 @Service
 public class CompanyDbLookupService {
