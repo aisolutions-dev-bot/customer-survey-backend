@@ -1,6 +1,7 @@
 package com.example.survey.config;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -12,9 +13,9 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Produces the RestTemplate used to call ai-solutions-organization-api
- * (system parameter flags, service-to-service calls) with a service-account
- * Basic Auth header, matching the pattern already used by
- * evaluation-management-backend's ServiceAuthHeaderFactory.
+ * (system parameter flags, company database lookups, service-to-service calls)
+ * with a service-account Basic Auth header, matching the pattern already used
+ * by evaluation-management-backend's ServiceAuthHeaderFactory.
  */
 @Configuration
 public class OrgApiClientConfig {
@@ -28,10 +29,21 @@ public class OrgApiClientConfig {
   @Value("${app.service.password}")
   private String servicePassword;
 
+  // Tenant routing cannot distinguish a slow org-api from an unreachable one,
+  // so a hung lookup has to end in a failed request. Without a read timeout the
+  // call waits forever and the survey request it belongs to never completes.
+  @Value("${org.api.connect-timeout:PT2S}")
+  private Duration connectTimeout;
+
+  @Value("${org.api.read-timeout:PT5S}")
+  private Duration readTimeout;
+
   @Bean
   public RestTemplate orgApiRestTemplate(RestTemplateBuilder builder) {
     return builder
         .rootUri(orgApiBaseUrl)
+        .connectTimeout(connectTimeout)
+        .readTimeout(readTimeout)
         .additionalInterceptors(buildServiceAccountAuthInterceptor())
         .build();
   }
