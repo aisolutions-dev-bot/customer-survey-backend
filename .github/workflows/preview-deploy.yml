@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE: ghcr.io/aisolutions-dev-bot/customer-survey-backend
+  IMAGE: ghcr.io/bcidev25/customer-survey-backend
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
