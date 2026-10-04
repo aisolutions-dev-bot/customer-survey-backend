@@ -55,7 +55,7 @@ dependencies {
     compileOnly "org.projectlombok:lombok:1.18.42"
     annotationProcessor "org.projectlombok:lombok:1.18.42"
 
-    implementation 'com.aisolutions:ai-solutions-java-shared-spring:0.6.0'
+    implementation 'com.aisolutions:ai-solutions-java-shared-spring:0.6.1'
 }
 
 tasks.named('test') {

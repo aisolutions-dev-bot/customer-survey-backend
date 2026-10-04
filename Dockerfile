@@ -1,5 +1,5 @@
 # Builds a JVM runner for the Railway staging service.
-FROM gradle:9.1.0-jdk25 AS builder
+FROM gradle:9.3.0-jdk25 AS builder
 
 WORKDIR /app
 
