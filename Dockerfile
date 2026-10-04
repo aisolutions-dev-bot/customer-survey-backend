@@ -1,32 +1,33 @@
-# syntax=docker/dockerfile:1.10
-FROM ghcr.io/graalvm/native-image-community:25 AS build
+# Builds a JVM runner for the Railway staging service.
+FROM gradle:9.1.0-jdk25 AS builder
 
 WORKDIR /app
-ARG GITHUB_ACTOR
 
 COPY gradlew ./gradlew
-COPY gradle/ gradle/
+COPY gradle/ ./gradle/
 COPY build.gradle settings.gradle ./
-RUN chmod +x ./gradlew
+COPY config/ ./config/
 
-COPY . .
+ARG GITHUB_ACTOR
+ARG GITHUB_TOKEN
 
-RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
-    --mount=type=cache,target=/root/.gradle \
-    GITHUB_ACTOR="$GITHUB_ACTOR" \
-    ./gradlew clean nativeCompile --no-daemon
+RUN chmod +x ./gradlew && \
+    GITHUB_ACTOR="$GITHUB_ACTOR" GITHUB_TOKEN="$GITHUB_TOKEN" \
+    ./gradlew dependencies --no-daemon
 
-FROM debian:bookworm-slim
+COPY src/ src/
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends --yes ca-certificates libz1 \
-    && rm -rf /var/lib/apt/lists/* \
-    && useradd --no-create-home --shell /usr/sbin/nologin --uid 10001 appuser
+RUN GITHUB_ACTOR="$GITHUB_ACTOR" GITHUB_TOKEN="$GITHUB_TOKEN" \
+    ./gradlew bootJar --no-daemon && \
+    application_jar=$(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-plain.jar' -print -quit) && \
+    test -n "$application_jar" && \
+    cp "$application_jar" /app/application.jar
+
+FROM eclipse-temurin:25-jre-jammy
 
 WORKDIR /app
-COPY --from=build /app/build/native/nativeCompile/customer-survey-backend /app/application
+COPY --from=builder /app/application.jar /app/application.jar
 
-USER 10001
 ENV PORT=8090
 EXPOSE 8090
-ENTRYPOINT ["/app/application"]
+ENTRYPOINT ["java", "-jar", "/app/application.jar"]

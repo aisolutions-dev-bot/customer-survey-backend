@@ -51,7 +51,7 @@ jobs:
           GITHUB_ACTOR: BCIDev25
           GITHUB_TOKEN: ${{ secrets.GHCR_PAT }}
         run: |
-          docker buildx build \
+          docker buildx build -f Dockerfile.native \
             --build-arg GITHUB_ACTOR="$GITHUB_ACTOR" \
             --secret id=github_token,env=GITHUB_TOKEN \
             --tag "${{ env.IMAGE }}:${{ env.IMAGE_TAG }}" \
