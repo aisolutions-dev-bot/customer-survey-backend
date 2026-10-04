@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE: ghcr.io/bcidev25/customer-survey-backend
+  IMAGE: ghcr.io/aisolutions-dev-bot/customer-survey-backend
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
@@ -83,6 +83,11 @@ jobs:
     runs-on: [self-hosted, preview-vps]
     needs: build
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the version-controlled service configuration
+        run: install -m 0644 deploy/customer-survey-backend.preview.yml /home/ubuntu/deploy/preview/customer-survey-backend.preview.yml
+
       - name: Login to GHCR
         run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u BCIDev25 --password-stdin
 

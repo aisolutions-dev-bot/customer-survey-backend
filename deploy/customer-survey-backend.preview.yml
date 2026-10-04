@@ -1,0 +1,24 @@
+services:
+  customer-survey-backend:
+    image: ghcr.io/aisolutions-dev-bot/customer-survey-backend:${IMAGE_TAG:-latest}
+    container_name: customer-survey-backend-preview
+    restart: unless-stopped
+    mem_limit: 768m
+    ports:
+      - "127.0.0.1:8095:8090"
+    environment:
+      DB_URL: ${DB_URL_JAVA}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      ORG_SERVICE_URL: http://org-api-preview:8080
+      SERVICE_ACCOUNT_USERNAME: ${SERVICE_ACCOUNT_USERNAME}
+      SERVICE_ACCOUNT_PASSWORD: ${SERVICE_ACCOUNT_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ai-solutions-kafka-preview:9092
+      CORS_ORIGIN: https://preview-customer-survey.aisolutionspl.com
+      CORS_ORIGIN2: https://preview.aisolutionspl.com
+    networks:
+      - aisolutions-preview
+
+networks:
+  aisolutions-preview:
+    external: true
