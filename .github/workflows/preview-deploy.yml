@@ -24,7 +24,7 @@ jobs:
           java-version: '25'
           cache: gradle
       - name: Run quality gates and tests
-        run: ./gradlew spotlessCheck checkstyleMain checkstyleTest pmdMain pmdTest test jacocoTestReport --no-daemon
+        run: GITHUB_ACTOR=BCIDev25 ./gradlew spotlessCheck checkstyleMain checkstyleTest pmdMain pmdTest test jacocoTestReport --no-daemon
 
   build:
     needs: quality
@@ -52,7 +52,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GHCR_PAT }}
         run: |
           docker buildx build -f Dockerfile.native \
-            --build-arg GITHUB_ACTOR="$GITHUB_ACTOR" \
+            --build-arg GITHUB_ACTOR=BCIDev25 \
             --secret id=github_token,env=GITHUB_TOKEN \
             --tag "${{ env.IMAGE }}:${{ env.IMAGE_TAG }}" \
             --tag "${{ env.IMAGE }}:latest" \
@@ -64,7 +64,7 @@ jobs:
           GITHUB_ACTOR: BCIDev25
           GITHUB_TOKEN: ${{ secrets.GHCR_PAT }}
           CUSTOMER_SURVEY_NATIVE_IMAGE: ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
-        run: ./gradlew nativeE2eTest --no-daemon
+        run: GITHUB_ACTOR=BCIDev25 ./gradlew nativeE2eTest --no-daemon
 
       - name: Push verified native image
         env:
