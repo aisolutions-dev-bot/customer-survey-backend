@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<ruleset name="AI Solutions Java Ruleset"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>AI Solutions production ruleset. See docs/development/linting-and-formatting.md.</description>
+
+    <!--
+      Baseline exclusions captured 2026-10-02 when PMD was introduced. Files that
+      predate the SOP are tracked as tech debt in
+      config/conventions/legacy-java-baseline.tsv. Do not add new files; remove an
+      entry once the rule no longer applies.
+    -->
+    <rule ref="category/java/design.xml/GodClass"/>
+    <rule ref="category/java/design.xml/NcssCount">
+        <properties>
+            <property name="classReportLevel" value="400"/>
+            <property name="methodReportLevel" value="40"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/design.xml/CouplingBetweenObjects"/>
+
+    <rule ref="category/java/errorprone.xml/AvoidCatchingGenericException"/>
+
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
+    <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals"/>
+</ruleset>

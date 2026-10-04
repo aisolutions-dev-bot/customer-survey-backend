@@ -1,13 +1,12 @@
 package com.example.survey;
 
+import com.example.survey.testsupport.SurveyIntegrationTestBase;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class CustomerSurveyBackendApplicationTests {
+/** Verifies the application context boots against ephemeral MySQL and Kafka. */
+class CustomerSurveyBackendApplicationTests extends SurveyIntegrationTestBase {
 
-	@Test
-	void contextLoads() {
-	}
-
+    /** Loads the full context, including the notification publisher. */
+    @Test
+    void contextLoads() {}
 }

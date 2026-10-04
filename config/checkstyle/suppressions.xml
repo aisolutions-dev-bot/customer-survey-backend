@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<!--
+  Baseline suppressions captured 2026-10-02 when Checkstyle was introduced. Files that
+  predate the linting SOP are tracked as tech debt in
+  config/conventions/legacy-java-baseline.tsv instead of here. Do not add new files:
+  any file touched after this baseline must pass Checkstyle in full.
+-->
+<suppressions>
+</suppressions>

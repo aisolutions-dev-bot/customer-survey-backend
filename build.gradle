@@ -1,15 +1,29 @@
+import java.security.MessageDigest
+
 plugins {
     id 'org.springframework.boot' version '3.5.4'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.graalvm.buildtools.native' version '0.10.6'
     id 'java'
+    id 'com.diffplug.spotless' version '8.10.2'
+    id 'checkstyle'
+    id 'pmd'
+    id 'jacoco'
 }
 
-/* group = 'com.example'
-version = '1.0.0'
-sourceCompatibility = '21' */
+group = 'com.aisolutions'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+graalvmNative {
+    binaries {
+        main {
+            imageName = 'customer-survey-backend'
+        }
     }
 }
 
@@ -29,26 +43,131 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation('org.springframework.boot:spring-boot-starter-mail') {
-        exclude group: 'org.eclipse.angus', module: 'jakarta.mail'
-    }
-    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // The Spring integration stages notifications into the shared outbox and relays them to Kafka.
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation 'org.testcontainers:mysql'
+    testImplementation 'org.testcontainers:kafka'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'com.mysql:mysql-connector-j'
 
     compileOnly "org.projectlombok:lombok:1.18.42"
     annotationProcessor "org.projectlombok:lombok:1.18.42"
 
-    implementation 'com.aisolutions:ai-solutions-java-shared:0.1.1'
-    implementation 'com.sun.mail:jakarta.mail:2.0.1'
-
+    implementation 'com.aisolutions:ai-solutions-java-shared-spring:0.6.0'
 }
 
-def javaExtension = project.extensions.getByType(JavaPluginExtension)
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags('native-e2e')
+    }
+}
 
-/* tasks.named('test') {
-    useJUnitPlatform()
-} */
+tasks.register('nativeE2eTest', Test) {
+    description = 'Runs the native notification outbox producer against ephemeral MySQL and Kafka.'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags('native-e2e')
+    }
+    shouldRunAfter(tasks.named('test'))
+    def nativeExecutable = providers.environmentVariable('CUSTOMER_SURVEY_NATIVE_RUNNER').orNull
+    if (nativeExecutable != null) {
+        systemProperty('customer-survey.native-runner', nativeExecutable)
+    }
+    def nativeImage = providers.environmentVariable('CUSTOMER_SURVEY_NATIVE_IMAGE').orNull
+    if (nativeImage != null) {
+        systemProperty('customer-survey.native-image', nativeImage)
+    }
+}
+
 tasks.named("bootRun") {
     jvmArgs = ["-Dspring.profiles.active=dev"]
+}
+
+// Only unchanged legacy Java files remain exempt while conventions are adopted.
+Map<String, Set<String>> legacyJavaBaselineHashesByPath = new HashMap<>()
+file('config/conventions/legacy-java-baseline.tsv').eachLine('UTF-8') { line ->
+    if (line.isBlank() || line.startsWith('#')) {
+        return
+    }
+    def parts = line.split('\t', 2)
+    if (parts.length == 2) {
+        legacyJavaBaselineHashesByPath.computeIfAbsent(parts[1], { new HashSet<>() }).add(parts[0])
+    }
+}
+
+def javaFilesRequiringConventions = files(provider {
+    fileTree('src') { include '**/*.java' }.files.findAll { sourceFile ->
+        def sourcePath = projectDir.toPath().relativize(sourceFile.toPath()).toString().replace('\\', '/')
+        def currentDigest = MessageDigest.getInstance('SHA-256').digest(sourceFile.bytes).encodeHex().toString()
+        !legacyJavaBaselineHashesByPath.getOrDefault(sourcePath, Collections.emptySet()).contains(currentDigest)
+    }
+})
+
+spotless {
+    java {
+        target javaFilesRequiringConventions
+        palantirJavaFormat('2.97.0')
+        removeUnusedImports()
+        // '\\#' catches static imports; placing it last matches checkstyle.xml's
+        // ImportOrder option="bottom" so the two tools agree on static-import placement.
+        importOrder('java', 'javax', 'jakarta', '', 'org.acme', '\\#')
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+checkstyle {
+    toolVersion = '14.3.0'
+    configFile = file('config/checkstyle/checkstyle.xml')
+    ignoreFailures = false
+}
+
+pmd {
+    toolVersion = '7.28.0'
+    ruleSetFiles = files('config/pmd/ruleset.xml')
+    ruleSets = []
+    ignoreFailures = false
+}
+
+jacoco {
+    toolVersion = '0.8.15'
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.withType(Checkstyle).configureEach {
+    if (name == 'checkstyleMain' || name == 'checkstyleTest') {
+        def sourceSetName = name == 'checkstyleTest' ? 'test' : 'main'
+        setSource(javaFilesRequiringConventions.filter { it.path.contains("/src/${sourceSetName}/") })
+    }
+}
+
+tasks.withType(Pmd).configureEach {
+    if (name == 'pmdMain' || name == 'pmdTest') {
+        def sourceSetName = name == 'pmdTest' ? 'test' : 'main'
+        setSource(javaFilesRequiringConventions.filter { it.path.contains("/src/${sourceSetName}/") })
+    }
+}
+
+tasks.register('installGitHooks', Copy) {
+    from 'scripts/pre-commit', 'scripts/commit-msg'
+    into '.git/hooks'
+    doLast {
+        file('.git/hooks/pre-commit').setExecutable(true)
+        file('.git/hooks/commit-msg').setExecutable(true)
+    }
 }
