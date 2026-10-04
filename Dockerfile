@@ -12,13 +12,11 @@ ARG GITHUB_ACTOR
 ARG GITHUB_TOKEN
 
 RUN chmod +x ./gradlew && \
-    GITHUB_ACTOR="$GITHUB_ACTOR" GITHUB_TOKEN="$GITHUB_TOKEN" \
     ./gradlew dependencies --no-daemon
 
 COPY src/ src/
 
-RUN GITHUB_ACTOR="$GITHUB_ACTOR" GITHUB_TOKEN="$GITHUB_TOKEN" \
-    ./gradlew bootJar --no-daemon && \
+RUN ./gradlew bootJar --no-daemon && \
     application_jar=$(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-plain.jar' -print -quit) && \
     test -n "$application_jar" && \
     cp "$application_jar" /app/application.jar
