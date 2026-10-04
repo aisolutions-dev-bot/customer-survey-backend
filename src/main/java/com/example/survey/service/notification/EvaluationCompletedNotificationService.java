@@ -178,7 +178,8 @@ public class EvaluationCompletedNotificationService {
         parameters.put("department_id", "");
         parameters.put("skillset", "");
         parameters.put("form_type", emptyIfNull(notice.formType()));
-        parameters.put("evaluation_score", notice.score() == null ? "" : notice.score().toString());
+        parameters.put(
+                "evaluation_score", notice.score() == null ? "" : notice.score().toString());
         return Map.copyOf(parameters);
     }
 

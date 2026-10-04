@@ -44,9 +44,10 @@ class NotificationChannelPublisherIntegrationTest extends SurveyIntegrationTestB
                     .contains(
                             recipient,
                             "notificationId",
-                            "contact_staff_activation_v1",
+                            "evaluation_completed_v1",
                             "templateParameters",
-                            "login_id");
+                            "evaluator_name",
+                            "evaluation_score");
         }
     }
 
