@@ -3,6 +3,7 @@ package com.example.survey.service.notification;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.util.Map;
 import java.util.UUID;
 
 import com.aisolutions.shared.notification.NotificationEnvelope;
@@ -40,7 +41,13 @@ class NativeNotificationOutboxE2E extends SurveyIntegrationTestBase {
             ConsumerRecord<String, String> publishedRecord = kafkaProbe.awaitRecipient(recipient);
 
             assertThat(publishedRecord.key()).isEqualTo("db_test2");
-            assertThat(publishedRecord.value()).contains(recipient, "notificationId");
+            assertThat(publishedRecord.value())
+                    .contains(
+                            recipient,
+                            "notificationId",
+                            "evaluation_completed_v1",
+                            "languageCode",
+                            "templateParameters");
         }
     }
 
@@ -94,11 +101,21 @@ class NativeNotificationOutboxE2E extends SurveyIntegrationTestBase {
                 UUID.randomUUID().toString(),
                 "db_test2",
                 recipient,
-                "Native regression",
-                "Native message",
                 null,
                 null,
-                null);
+                "evaluation_completed_v1",
+                "en_US",
+                null,
+                Map.of(
+                        "evaluator_name", "Evaluator",
+                        "staff_id", "STAFF-001",
+                        "evaluatee_name", "Evaluatee",
+                        "project_id", "PROJECT-001",
+                        "project_name", "Native e2e project",
+                        "department_id", "Research",
+                        "skillset", "General",
+                        "form_type", "CARPENTER",
+                        "evaluation_score", "88"));
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
             repository.enqueue(connection, new NotificationOutboxEvent("email", envelope));

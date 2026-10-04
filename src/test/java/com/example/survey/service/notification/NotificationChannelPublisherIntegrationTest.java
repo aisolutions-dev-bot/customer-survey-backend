@@ -40,7 +40,13 @@ class NotificationChannelPublisherIntegrationTest extends SurveyIntegrationTestB
             notificationOutboxRelay.publishPendingBatches();
             ConsumerRecord<String, String> record = probe.awaitRecipient(recipient);
             assertThat(record.key()).isEqualTo(DEFAULT_COMPANY_ID);
-            assertThat(record.value()).contains(recipient, "notificationId");
+            assertThat(record.value())
+                    .contains(
+                            recipient,
+                            "notificationId",
+                            "contact_staff_activation_v1",
+                            "templateParameters",
+                            "login_id");
         }
     }
 
@@ -52,7 +58,20 @@ class NotificationChannelPublisherIntegrationTest extends SurveyIntegrationTestB
     /** Stages an email on a Spring-managed transaction before the relay sees it. */
     private void stageEmailNotification(String recipient) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-        transactionTemplate.executeWithoutResult(status -> springNotificationPublisher.enqueueEmail(
-                DEFAULT_COMPANY_ID, recipient, "Channel probe", "<p>Hello</p>"));
+        transactionTemplate.executeWithoutResult(status -> springNotificationPublisher.enqueueEmailTemplate(
+                DEFAULT_COMPANY_ID,
+                recipient,
+                "evaluation_completed_v1",
+                "en_US",
+                java.util.Map.of(
+                        "evaluator_name", "Evaluator",
+                        "staff_id", "STAFF-001",
+                        "evaluatee_name", "Evaluatee",
+                        "project_id", "PROJECT-001",
+                        "project_name", "Project",
+                        "department_id", "",
+                        "skillset", "",
+                        "form_type", "CARPENTER",
+                        "evaluation_score", "88")));
     }
 }

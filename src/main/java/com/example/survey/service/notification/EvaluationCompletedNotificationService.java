@@ -1,11 +1,9 @@
 package com.example.survey.service.notification;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.aisolutions.shared.notification.spring.SpringNotificationPublisher;
-import com.aisolutions.shared.service.whatsapp.TemplateComponent;
-import com.aisolutions.shared.service.whatsapp.TemplateComponent.NamedParameter;
 import com.example.survey.dto.StaffDTO;
 import com.example.survey.model.EvaluationDistributionNonProj;
 import com.example.survey.model.EvaluationRating;
@@ -19,9 +17,8 @@ import org.springframework.stereotype.Service;
  * non-project submission.
  *
  * <p>Delegates recipient resolution to {@link #resolveEvaluator} and
- * {@link #resolveEvaluateeName}, renders each channel in {@link #buildSmsText},
- * {@link #buildEmailBody} and {@link #buildWhatsappComponents}, then publishes the
- * rendered content through {@link SpringNotificationPublisher}. The delivery request
+ * {@link #resolveEvaluateeName}, then publishes registry template parameters through
+ * {@link SpringNotificationPublisher}. The delivery request
  * is staged on the rating transaction so either both records commit or neither does.
  */
 @Service
@@ -29,11 +26,9 @@ public class EvaluationCompletedNotificationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EvaluationCompletedNotificationService.class);
 
-    private static final String EMAIL_SUBJECT_TEMPLATE = "Evaluation Submitted Successfully - %s";
     private static final String WHATSAPP_TEMPLATE_NAME = "evaluation_completed_v1";
     private static final String WHATSAPP_LANGUAGE_CODE = "en_US";
-    private static final String MISSING_SCORE_TEXT = "-";
-    private static final String SMS_LINE_BREAK = "\r\n";
+    private static final String TEMPLATE_LANGUAGE_CODE = "en_US";
 
     private final StaffRepository staffRepository;
     private final NotificationConfigCacheService notificationConfigCacheService;
@@ -80,9 +75,11 @@ public class EvaluationCompletedNotificationService {
             EvaluationDistributionNonProj distribution, EvaluationRating rating, StaffDTO evaluator) {
         return new EvaluationCompletionNotice(
                 evaluator.getName(),
+                rating.getEvaluateeId(),
                 evaluator.getEmailCompany(),
                 evaluator.getTelMobile(),
                 resolveEvaluateeName(rating.getEvaluateeId()),
+                distribution.getProjectId(),
                 resolveProjectName(distribution),
                 rating.getFormType(),
                 resolveScore(rating),
@@ -102,26 +99,35 @@ public class EvaluationCompletedNotificationService {
                 notice.evaluatorMobile(),
                 WHATSAPP_TEMPLATE_NAME,
                 WHATSAPP_LANGUAGE_CODE,
-                buildWhatsappComponents(notice));
+                templateParameters(notice));
     }
 
-    /** Stages the rendered SMS when SMS is enabled and a mobile number exists. */
+    /** Stages the SMS template when SMS is enabled and a mobile number exists. */
     private void dispatchSms(EvaluationCompletionNotice notice) {
         if (!shouldStageChannel(
                 NotificationChannel.SMS, notificationConfigCacheService.isSmsEnabled(), notice.evaluatorMobile())) {
             return;
         }
-        springNotificationPublisher.enqueueSms(notice.companyId(), notice.evaluatorMobile(), buildSmsText(notice));
+        springNotificationPublisher.enqueueSmsTemplate(
+                notice.companyId(),
+                notice.evaluatorMobile(),
+                WHATSAPP_TEMPLATE_NAME,
+                TEMPLATE_LANGUAGE_CODE,
+                templateParameters(notice));
     }
 
-    /** Stages the rendered email when email is enabled and a company address exists. */
+    /** Stages the email template when email is enabled and a company address exists. */
     private void dispatchEmail(EvaluationCompletionNotice notice) {
         if (!shouldStageChannel(
                 NotificationChannel.EMAIL, notificationConfigCacheService.isEmailEnabled(), notice.evaluatorEmail())) {
             return;
         }
-        springNotificationPublisher.enqueueEmail(
-                notice.companyId(), notice.evaluatorEmail(), buildEmailSubject(notice), buildEmailBody(notice));
+        springNotificationPublisher.enqueueEmailTemplate(
+                notice.companyId(),
+                notice.evaluatorEmail(),
+                WHATSAPP_TEMPLATE_NAME,
+                TEMPLATE_LANGUAGE_CODE,
+                templateParameters(notice));
     }
 
     /** Records a disabled or incomplete channel before deciding whether to stage it. */
@@ -161,55 +167,19 @@ public class EvaluationCompletedNotificationService {
         return rating.getWeightedScore() != null ? Math.round(rating.getWeightedScore()) : null;
     }
 
-    /** Builds the subject line naming the evaluatee. */
-    private String buildEmailSubject(EvaluationCompletionNotice notice) {
-        return String.format(EMAIL_SUBJECT_TEMPLATE, notice.evaluateeName());
-    }
-
-    /** Renders the plain-text SMS confirmation. */
-    private String buildSmsText(EvaluationCompletionNotice notice) {
-        return String.join(
-                SMS_LINE_BREAK,
-                "Your evaluation has been submitted successfully.",
-                "Staff: " + notice.evaluateeName(),
-                "Reference: " + notice.projectName(),
-                "Form Type: " + notice.formType(),
-                "Score: " + notice.score(),
-                "Thank you.");
-    }
-
-    /** Renders the HTML email confirmation. */
-    private String buildEmailBody(EvaluationCompletionNotice notice) {
-        String scoreText = notice.score() != null ? String.valueOf(notice.score()) : MISSING_SCORE_TEXT;
-        return """
-        Dear %s,<br>
-        <br>
-        This is to confirm that your evaluation has been submitted successfully.<br>
-        Below are the details for your reference:<br>
-        <br>
-        Evaluatee : %s<br>
-        Reference : %s<br>
-        Form Type : %s<br>
-        Evaluation Score : %s/100<br>
-        <br>
-        Thank you for completing the evaluation promptly.<br>
-        <br>
-        Best regards,<br>
-        Evaluation Management System
-        """.formatted(
-                notice.evaluatorName(), notice.evaluateeName(), notice.projectName(), notice.formType(), scoreText);
-    }
-
-    /** Builds the approved template's named body parameters for the WhatsApp payload. */
-    private List<Map<String, Object>> buildWhatsappComponents(EvaluationCompletionNotice notice) {
-        String scoreText = notice.score() != null ? String.valueOf(notice.score()) : "";
-        return List.of(TemplateComponent.bodyNamed(
-                        new NamedParameter("evaluator_name", notice.evaluatorName()),
-                        new NamedParameter("evaluatee_name", notice.evaluateeName()),
-                        new NamedParameter("project_name", notice.projectName()),
-                        new NamedParameter("form_type", notice.formType()),
-                        new NamedParameter("evaluation_score", scoreText))
-                .toMap());
+    /** Builds registry data for evaluation-completion templates without rendering channel content. */
+    private Map<String, Object> templateParameters(EvaluationCompletionNotice notice) {
+        Map<String, Object> parameters = new LinkedHashMap<>();
+        parameters.put("evaluator_name", emptyIfNull(notice.evaluatorName()));
+        parameters.put("staff_id", emptyIfNull(notice.evaluateeId()));
+        parameters.put("evaluatee_name", emptyIfNull(notice.evaluateeName()));
+        parameters.put("project_id", emptyIfNull(notice.projectId()));
+        parameters.put("project_name", emptyIfNull(notice.projectName()));
+        parameters.put("department_id", "");
+        parameters.put("skillset", "");
+        parameters.put("form_type", emptyIfNull(notice.formType()));
+        parameters.put("evaluation_score", notice.score() == null ? "" : notice.score().toString());
+        return Map.copyOf(parameters);
     }
 
     /** Reports whether a contact detail is absent or whitespace-only. */
@@ -217,14 +187,21 @@ public class EvaluationCompletedNotificationService {
         return value == null || value.isBlank();
     }
 
-    /** Carries the recipient and evaluation facts rendered into every channel. */
+    /** Carries the recipient and evaluation facts rendered by the notification registry. */
     record EvaluationCompletionNotice(
             String evaluatorName,
+            String evaluateeId,
             String evaluatorEmail,
             String evaluatorMobile,
             String evaluateeName,
+            String projectId,
             String projectName,
             String formType,
             Long score,
             String companyId) {}
+
+    /** Replaces null values so the shared envelope can copy the parameter map. */
+    private String emptyIfNull(String value) {
+        return value == null ? "" : value;
+    }
 }

@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -52,13 +51,26 @@ class EvaluationCompletedNotificationServiceTest {
         newService().notifyEvaluatorOfCompletion(buildDistribution(), buildRating());
 
         verify(springNotificationPublisher)
-                .enqueueEmail(
-                        eq(COMPANY_DATABASE), eq(EVALUATOR_EMAIL), contains(EVALUATEE_NAME), contains(EVALUATEE_NAME));
+                .enqueueEmailTemplate(
+                        eq(COMPANY_DATABASE),
+                        eq(EVALUATOR_EMAIL),
+                        eq("evaluation_completed_v1"),
+                        eq("en_US"),
+                        eq(expectedTemplateParameters()));
         verify(springNotificationPublisher)
-                .enqueueSms(eq(COMPANY_DATABASE), eq(EVALUATOR_MOBILE), contains(EVALUATEE_NAME));
+                .enqueueSmsTemplate(
+                        eq(COMPANY_DATABASE),
+                        eq(EVALUATOR_MOBILE),
+                        eq("evaluation_completed_v1"),
+                        eq("en_US"),
+                        eq(expectedTemplateParameters()));
         verify(springNotificationPublisher)
                 .enqueueWhatsappTemplate(
-                        eq(COMPANY_DATABASE), eq(EVALUATOR_MOBILE), eq("evaluation_completed_v1"), eq("en_US"), any());
+                        eq(COMPANY_DATABASE),
+                        eq(EVALUATOR_MOBILE),
+                        eq("evaluation_completed_v1"),
+                        eq("en_US"),
+                        eq(expectedTemplateParameters()));
     }
 
     /** Verifies the org-wide flags suppress publishing without touching the publisher. */
@@ -115,6 +127,20 @@ class EvaluationCompletedNotificationServiceTest {
         rating.setFormType("CARPENTER");
         rating.setWeightedScore(88.0);
         return rating;
+    }
+
+    /** Returns the union of declared channel parameters sent to the registry. */
+    private java.util.Map<String, Object> expectedTemplateParameters() {
+        return java.util.Map.of(
+                "evaluator_name", EVALUATOR_NAME,
+                "staff_id", EVALUATEE_ID,
+                "evaluatee_name", EVALUATEE_NAME,
+                "project_id", "",
+                "project_name", "Project X",
+                "department_id", "",
+                "skillset", "",
+                "form_type", "CARPENTER",
+                "evaluation_score", "88");
     }
 
     /** Minimal staff projection implementation for the notifier unit test. */
