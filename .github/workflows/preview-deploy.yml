@@ -96,7 +96,11 @@ jobs:
 
       - name: Deploy on VPS
         working-directory: /home/ubuntu/deploy/preview
-        run: IMAGE_TAG=${{ env.IMAGE_TAG }} docker compose -f customer-survey-backend.preview.yml up -d
+        run: |
+          IMAGE_TAG=${{ env.IMAGE_TAG }} docker compose \
+            -f customer-survey-backend.preview.yml \
+            -f <(printf 'services:\n  customer-survey-backend:\n    environment:\n      KAFKA_BOOTSTRAP_SERVERS: ai-solutions-kafka-preview:9092\n') \
+            up -d
 
       # The app binds 8090 inside the container; the preview compose publishes it
       # on 8095 because 8090 is already taken on the host.
