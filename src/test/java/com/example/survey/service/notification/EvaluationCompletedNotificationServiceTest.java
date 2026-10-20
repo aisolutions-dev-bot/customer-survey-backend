@@ -124,6 +124,8 @@ class EvaluationCompletedNotificationServiceTest {
         EvaluationRating rating = new EvaluationRating();
         rating.setEvaluateeId(EVALUATEE_ID);
         rating.setFormType("CARPENTER");
+        rating.setDepartmentId("TEST-A");
+        rating.setSkillSet("JUNIOR");
         rating.setWeightedScore(88.0);
         return rating;
     }
@@ -136,8 +138,8 @@ class EvaluationCompletedNotificationServiceTest {
                 "evaluatee_name", EVALUATEE_NAME,
                 "project_id", "",
                 "project_name", "Project X",
-                "department_id", "",
-                "skillset", "",
+                "department_id", "TEST-A",
+                "skillset", "JUNIOR",
                 "form_type", "CARPENTER",
                 "evaluation_score", "88");
     }

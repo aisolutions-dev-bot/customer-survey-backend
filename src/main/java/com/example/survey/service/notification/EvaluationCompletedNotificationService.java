@@ -81,6 +81,8 @@ public class EvaluationCompletedNotificationService {
                 resolveEvaluateeName(rating.getEvaluateeId()),
                 distribution.getProjectId(),
                 resolveProjectName(distribution),
+                rating.getDepartmentId(),
+                rating.getSkillSet(),
                 rating.getFormType(),
                 resolveScore(rating),
                 notificationCompanyResolver.resolveRequiredCompanyId());
@@ -175,8 +177,8 @@ public class EvaluationCompletedNotificationService {
         parameters.put("evaluatee_name", emptyIfNull(notice.evaluateeName()));
         parameters.put("project_id", emptyIfNull(notice.projectId()));
         parameters.put("project_name", emptyIfNull(notice.projectName()));
-        parameters.put("department_id", "");
-        parameters.put("skillset", "");
+        parameters.put("department_id", emptyIfNull(notice.departmentId()));
+        parameters.put("skillset", emptyIfNull(notice.skillSet()));
         parameters.put("form_type", emptyIfNull(notice.formType()));
         parameters.put(
                 "evaluation_score", notice.score() == null ? "" : notice.score().toString());
@@ -197,6 +199,8 @@ public class EvaluationCompletedNotificationService {
             String evaluateeName,
             String projectId,
             String projectName,
+            String departmentId,
+            String skillSet,
             String formType,
             Long score,
             String companyId) {}
